@@ -33,6 +33,7 @@ function saveGame() {
     data[i].ivs = pkmn[i].ivs;
     data[i].exp = pkmn[i].exp;
     data[i].newEvolution = pkmn[i].newEvolution;
+    data[i].ability = pkmn[i].ability;
   }
 
   localStorage.setItem("gameData", JSON.stringify(data));
@@ -73,6 +74,7 @@ function loadGame() {
       pkmn[i].ivs = data[i].ivs;
       pkmn[i].exp = data[i].exp;
       pkmn[i].newEvolution = data[i].newEvolution;
+      pkmn[i].ability = data[i].ability;
     }
   }
 

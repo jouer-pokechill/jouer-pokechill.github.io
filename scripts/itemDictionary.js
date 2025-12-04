@@ -44,6 +44,7 @@ item.magnet = {
 
 item.metalCoat = {
     type: "held",
+    evo: true,
     info: function() {return `When held: Increase the power of Metal-Type moves by ${this.power()}%`},
     power : function() { return 10+(10*returnItemLevel(this.id))}
 }
@@ -209,9 +210,53 @@ item.babiriBerry = {
 }
 
 
+item.waterStone = {
+    evo: true,
+    info: function() {return `Evolve certain kinds of Pokemon`},
+}
+item.thunderStone = {
+    evo: true,
+    info: function() {return `Evolve certain kinds of Pokemon`},
+}
+item.sunStone = {
+    evo: true,
+    info: function() {return `Evolve certain kinds of Pokemon`},
+}
 
+item.ovalStone = {
+    evo: true,
+    info: function() {return `Evolve certain kinds of Pokemon`},
+}
+item.moonStone = {
+    evo: true,
+    info: function() {return `Evolve certain kinds of Pokemon`},
+}
+item.leafStone = {
+    evo: true,
+    info: function() {return `Evolve certain kinds of Pokemon`},
+}
+item.iceStone = {
+    evo: true,
+    info: function() {return `Evolve certain kinds of Pokemon`},
+}
 
+item.fireStone = {
+    evo: true,
+    info: function() {return `Evolve certain kinds of Pokemon`},
+}
+item.duskStone = {
+    evo: true,
+    info: function() {return `Evolve certain kinds of Pokemon`},
+}
+item.dawnStone = {
+    evo: true,
+    info: function() {return `Evolve certain kinds of Pokemon`},
+}
 
+item.shinyStone = {
+    evo: true,
+    info: function() {return `Evolve certain kinds of Pokemon`},
+}
 
 
 

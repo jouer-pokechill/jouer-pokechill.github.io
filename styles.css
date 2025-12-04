@@ -781,8 +781,8 @@ border: 1px solid rgba(255, 255, 255, 0.3);
 
 .pkmn-stats-stat-abilities div{
     height: 1.8rem;
-    background: var(--dark2);
     padding: 0.5rem;
+    background: var(--dark2);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1716,6 +1716,8 @@ border: 1px solid rgba(255, 255, 255, 0.3);
     }
 }
 
+
+
 #item-menu-list{
     width: 95%;
     margin-top: 1rem;
@@ -2440,4 +2442,48 @@ border: 1px solid rgba(255, 255, 255, 0.3);
 
 #guide-list div:active{
     scale: 0.95;
+}
+
+#pkmn-edit-ability svg{
+    margin-left: 0.3rem;
+}
+
+.ability-uncommon{
+    outline: solid #F0E07D 2px;
+    background: url("data:image/svg+xml,%3Csvg width='16' height='20' viewBox='0 0 16 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ECDD33' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M8 0v20L0 10M16 0v10L8 0M16 10v10H8'/%3E%3C/g%3E%3C/svg%3E")
+    !important
+    ;
+    background-size: 40% !important;
+    box-shadow: #F0E07D 0 0 8px 0px;
+}
+
+.ability-uncommon svg{
+    color: #F0E07D;
+}
+
+.ability-rare{
+    outline: solid #86cfd1 2px;
+    background: url("data:image/svg+xml,%3Csvg width='16' height='20' viewBox='0 0 16 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2399F1D8' fill-opacity='0.2' fill-rule='evenodd'%3E%3Cpath d='M8 0v20L0 10M16 0v10L8 0M16 10v10H8'/%3E%3C/g%3E%3C/svg%3E")
+    !important;
+    background-size: 40% !important;
+    box-shadow: #b6ffea 0 0 8px 0px;
+    animation: ability-rare infinite 10s ease-in-out;
+}
+
+@keyframes ability-rare {
+    0%{outline: solid #86cfd1 2px;}
+    50%{outline: solid #cf86d1 2px;}
+    100%{outline: solid #86cfd1 2px;}
+}
+
+
+.ability-rare svg{
+    color: #99F1D8;
+    animation: ability-rare-svg infinite 10s ease-in-out;
+}
+
+@keyframes ability-rare-svg {
+    0%{ color: #86cfd1;}
+    50%{color:  #cf86d1;}
+    100%{ color: #86cfd1;}
 }

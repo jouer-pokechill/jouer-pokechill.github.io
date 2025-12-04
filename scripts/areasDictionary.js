@@ -14,6 +14,25 @@ const wildAreaLevel1 = 10
 const wildAreaLevel2 = 30
 const wildAreaLevel3 = 50
 const wildAreaLevel4 = 70
+
+const wildRareItemsFire = [item.charcoal, item.occaBerry]
+const wildRareItemsWater = [item.mysticWater, item.passhoBerry]
+const wildRareItemsElectric = [item.magnet, item.wacanBerry]
+const wildRareItemsGrass = [item.miracleSeed, item.rindoBerry]
+const wildRareItemsIce = [item.neverMeltIce, item.yacheBerry]
+const wildRareItemsFighting = [item.sharpBeak, item.chopleBerry]
+const wildRareItemsPoison = [item.poisonBarb, item.kebiaBerry]
+const wildRareItemsGround = [item.softSand, item.shucaBerry]
+const wildRareItemsFlying = [item.sharpBeak, item.cobaBerry]
+const wildRareItemsPsychic = [item.twistedSpoon, item.payapaBerry]
+const wildRareItemsBug = [item.silverPowder, item.tangaBerry]
+const wildRareItemsRock = [item.hardStone, item.chartiBerry]
+const wildRareItemsGhost = [item.spellTag, item.kasibBerry]
+const wildRareItemsDragon = [item.dragonFang, item.habanBerry]
+const wildRareItemsDark = [item.blackGlasses, item.colburBerry]
+const wildRareItemsSteel = [item.metalCoat, item.babiriBerry]
+const wildRareItemsNormal = [item.silkScarf]
+const wildRareItemsFairy = [item.fairyFeather]
 //rotation 1
 areas.verdantForest = {
     rotation : 1,
@@ -28,7 +47,7 @@ areas.verdantForest = {
     },
     drops: {
         common : [item.mysteryEgg],
-        rare : [item.silverPowder]
+        rare : wildRareItemsBug
     }
 }
 
@@ -46,7 +65,7 @@ areas.foggyGraveyard = {
     },
     drops: {
         common : [item.mysteryEgg],
-        rare : [item.spellTag]
+        rare : wildRareItemsGhost
     }
 }
 
@@ -63,7 +82,7 @@ areas.woodlandConcert = {
     },
     drops: {
         common : [item.mysteryEgg],
-        rare : [item.miracleSeed]
+        rare : wildRareItemsGrass
     }
 }
 
@@ -80,7 +99,7 @@ areas.mantleCore = {
     },
     drops: {
         common : [item.mysteryEgg],
-        rare : [item.hardStone]
+        rare : wildRareItemsRock
     }
 }
 
@@ -98,7 +117,7 @@ areas.fidoPark = {
     },
     drops: {
         common : [item.mysteryEgg],
-        rare : [item.silkScarf]
+        rare : wildRareItemsNormal
     }
 }
 
@@ -115,7 +134,7 @@ areas.citySewers = {
     },
     drops: {
         common : [item.mysteryEgg],
-        rare : [item.poisonBarb]
+        rare : wildRareItemsPoison
     }
 }
 
@@ -132,7 +151,7 @@ areas.activeVolcano = {
     },
     drops: {
         common : [item.mysteryEgg],
-        rare : [item.charcoal]
+        rare : wildRareItemsFire
     }
 } 
 
@@ -149,7 +168,7 @@ areas.powerPlant = {
     },
     drops: {
         common : [item.mysteryEgg],
-        rare : [item.magnet]
+        rare : wildRareItemsElectric
     }
 }
 
@@ -167,7 +186,7 @@ areas.quietMeadow = {
     },
     drops: {
         common : [item.mysteryEgg],
-        rare : [item.blackGlasses]
+        rare : wildRareItemsDark
     }
 }
 
@@ -185,7 +204,7 @@ areas.urbanWalkway = {
     },
     drops: {
         common : [item.mysteryEgg],
-        rare : [item.fairyFeather]
+        rare : wildRareItemsFairy
     }
 }
 
@@ -203,7 +222,7 @@ areas.sandyDunes = {
     },
     drops: {
         common : [item.mysteryEgg],
-        rare : [item.softSand]
+        rare : wildRareItemsGround
     }
 }
 
@@ -221,7 +240,7 @@ areas.sunkenShip = {
     },
     drops: {
         common : [item.mysteryEgg],
-        rare : [item.metalCoat]
+        rare : wildRareItemsSteel
     }
 }
 
@@ -239,7 +258,7 @@ areas.offshoreRigger = {
     },
     drops: {
         common : [item.mysteryEgg],
-        rare : [item.sharpBeak]
+        rare : wildRareItemsFlying
     }
 }
 
@@ -256,7 +275,7 @@ areas.safariZone = {
     },
     drops: {
         common : [item.mysteryEgg],
-        rare : [item.dragonFang]
+        rare : wildRareItemsNormal
     }
 }
 
@@ -273,7 +292,7 @@ areas.coolBeach = {
     },
     drops: {
         common : [item.mysteryEgg],
-        rare : [item.mysticWater]
+        rare : wildRareItemsWater
     }
 }
 
@@ -290,7 +309,7 @@ areas.computeringLab = {
     },
     drops: {
         common : [item.mysteryEgg],
-        rare : [item.twistedSpoon]
+        rare : wildRareItemsPsychic
     }
 }
 
@@ -309,7 +328,7 @@ areas.gemstoneCavern = {
     },
     drops: {
         common : [item.mysteryEgg],
-        rare : [item.hardStone]
+        rare : wildRareItemsRock
     }
 }
 
@@ -326,7 +345,7 @@ areas.frozenLake = {
     },
     drops: {
         common : [item.mysteryEgg],
-        rare : [item.neverMeltIce]
+        rare : wildRareItemsIce
     }
 }
 
@@ -343,7 +362,7 @@ areas.abandonedManor = {
     },
     drops: {
         common : [item.mysteryEgg],
-        rare : [item.spellTag]
+        rare : wildRareItemsGhost
     }
 }
 
@@ -360,7 +379,7 @@ areas.dracoLair = {
     },
     drops: {
         common : [item.mysteryEgg],
-        rare : [item.dragonFang]
+        rare : wildRareItemsDragon
     }
 }
 
@@ -378,7 +397,7 @@ areas.mountainTrail = {
     },
     drops: {
         common : [item.mysteryEgg],
-        rare : [item.hardStone]
+        rare : wildRareItemsRock
     }
 }
 
@@ -396,7 +415,7 @@ areas.teaParlor = {
     },
     drops: {
         common : [item.mysteryEgg],
-        rare : [item.fairyFeather]
+        rare : wildRareItemsFairy
     }
 }
 
@@ -413,7 +432,7 @@ areas.pokemonDojo = {
     },
     drops: {
         common : [item.mysteryEgg],
-        rare : [item.blackBelt]
+        rare : wildRareItemsFighting
     }
 }
 
@@ -430,7 +449,7 @@ areas.skyHigh = {
     },
     drops: {
         common : [item.mysteryEgg],
-        rare : [item.sharpBeak]
+        rare : wildRareItemsFlying
     }
 }
 
@@ -504,6 +523,23 @@ const rotationDungeonMax = 3;
 
 
 //rotation 1
+areas.sinnohUndergroundI = {
+    rotation : 1,
+    type: `dungeon`,
+    background : `cave`,
+    level : wildAreaLevel2,
+    unlockDescription : `🔒 Defeat Gym Leader Brock in VS to unlock`,
+    unlockRequirement : function() { return areas.vsGymLeaderBrock.defeated },
+    icon: item.waterStone,
+    spawns: {
+        common : [pkmn.carbink,pkmn.boldore, pkmn.shieldon, pkmn.roggenrola],
+    },
+    drops: {
+        common : [item.nothing],
+        rare : [item.waterStone, item.thunderStone, item.sunStone]
+    },
+}
+
 areas.beginnerTrainingI = {
     rotation : 1,
     type: `dungeon`,
@@ -557,6 +593,24 @@ areas.expertTrainingI = {
 
 
 //rotation 2
+
+areas.sinnohUndergroundII = {
+    rotation : 2,
+    type: `dungeon`,
+    background : `cave`,
+    level : wildAreaLevel2,
+    unlockDescription : `🔒 Defeat Gym Leader Brock in VS to unlock`,
+    unlockRequirement : function() { return areas.vsGymLeaderBrock.defeated },
+    icon: item.leafStone,
+    spawns: {
+        common : [pkmn.carbink,pkmn.boldore, pkmn.shieldon, pkmn.roggenrola],
+    },
+    drops: {
+        common : [item.nothing],
+        rare : [item.ovalStone, item.moonStone, item.leafStone, item.iceStone]
+    },
+}
+
 areas.beginnerTrainingII = {
     rotation : 2,
     type: `dungeon`,
@@ -609,6 +663,24 @@ areas.expertTrainingII = {
 }
 
 //rotation 3
+
+areas.sinnohUndergroundIII = {
+    rotation : 3,
+    type: `dungeon`,
+    background : `cave`,
+    level : wildAreaLevel2,
+    unlockDescription : `🔒 Defeat Gym Leader Brock in VS to unlock`,
+    unlockRequirement : function() { return areas.vsGymLeaderBrock.defeated },
+    icon: item.fireStone,
+    spawns: {
+        common : [pkmn.carbink,pkmn.boldore, pkmn.shieldon, pkmn.roggenrola],
+    },
+    drops: {
+        common : [item.nothing],
+        rare : [item.fireStone, item.duskStone, item.dawnStone, item.shinyStone]
+    },
+}
+
 areas.beginnerTrainingIII = {
     rotation : 3,
     type: `dungeon`,
@@ -770,7 +842,7 @@ areas.vsYounsterBilly = {
         slot3 : pkmn.starly,
         slot3Moves : [move.peck.id],
     },
-    reward : [pkmn.rockruff]
+    reward : [pkmn.chewtle]
 }
 
 areas.vsAromaLadyCatherine = {
@@ -832,7 +904,7 @@ areas.vsGymLeaderBrock = {
         slot4 : pkmn.omanyte,
         slot4Moves : [move.smackDown.id, move.waterGun.id],
         slot5 : pkmn.rhyhorn,
-        slot5Moves : [move.mudShot.id, move.ancientPower.id],
+        slot5Moves : [move.mudSlap.id, move.rockThrow.id],
         slot6 : pkmn.aerodactyl,
         slot6Moves : [move.smackDown.id, move.gust.id],
     },

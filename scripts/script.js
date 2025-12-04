@@ -10,7 +10,7 @@ document.getElementById("settings-theme").addEventListener("change", e => {
 });
 
 
-saved.version = 0.2
+saved.version = 0.1
 
 function updateGameVersion() {
 
@@ -19,7 +19,7 @@ function updateGameVersion() {
     saved.tutorialStep = "intro"
   }
 
-  saved.version = 0.2
+  saved.version = 0.3
   document.getElementById(`game-version`).innerHTML = `v${saved.version}`
 
 }
@@ -160,11 +160,7 @@ observer.observe(document.body, {
 
 
 
-
-
-
-
-function learnPkmnMove(id, level, mod) {
+/*function learnPkmnMove(id, level, mod) {
     while (true) {
         const types = pkmn[id].type;
         const knownMoves = pkmn[id].movepool || [];
@@ -196,7 +192,7 @@ function learnPkmnMove(id, level, mod) {
         const roll = Math.random();
         let chosenList;
 
-        if (roll < 0.40) chosenList = typeMatch.length ? typeMatch : movesetMatch.length ? movesetMatch : allTag;
+        if (roll < 0.90) chosenList = typeMatch.length ? typeMatch : movesetMatch.length ? movesetMatch : allTag;
         else if (roll < 0.80) chosenList = movesetMatch.length ? movesetMatch : typeMatch.length ? typeMatch : allTag;
         else chosenList = allTag.length ? allTag : typeMatch.length ? typeMatch : movesetMatch;
 
@@ -208,7 +204,100 @@ function learnPkmnMove(id, level, mod) {
 
         return move[chosenMove].id;
     }
+}*/
+
+function learnPkmnMove(id, level, mod) {
+    while (true) {
+        const types = pkmn[id].type;
+        const knownMoves = pkmn[id].movepool || [];
+
+        let tier = 1;
+        if (level >= 10 && rng(0.25)) tier++;
+        if (level >= 20 && rng(0.25)) tier++;
+        if (level >= 30 && rng(0.25)) tier++;
+        if (level >= 50 && rng(0.25)) tier++;
+        if (level >= 60 && rng(0.25)) tier++;
+        tier = Math.min(tier, 3);
+
+        const allMoves = Object.keys(move).filter(m => {
+            const data = move[m];
+            const notKnown = mod !== "wild" ? !knownMoves.includes(m) : true;
+            return data.rarity === tier && notKnown;
+        });
+
+        const typeMatch = [];
+        const movesetMatch = [];
+        const allTag = [];
+
+        allMoves.forEach(m => {
+            const data = move[m];
+            if (types.includes(data.type)) typeMatch.push(m);
+            else if (data.moveset.includes("all")) allTag.push(m);
+            else if (types.some(t => data.moveset.includes(t))) movesetMatch.push(m);
+        });
+
+        if (level === 1) {
+            if (!typeMatch.length) continue;
+            const chosenMove = typeMatch[Math.floor(Math.random() * typeMatch.length)];
+            if (move[chosenMove].power <= 0) continue;
+            return move[chosenMove].id;
+        }
+
+        const roll = Math.random();
+        let chosenList;
+
+        if (roll < 0.65) {
+            if (typeMatch.length) chosenList = typeMatch;
+            else if (movesetMatch.length) chosenList = movesetMatch;
+            else continue; 
+        }
+        else if (roll < 0.50) {
+            if (movesetMatch.length) chosenList = movesetMatch;
+            else if (typeMatch.length) chosenList = typeMatch;
+            else continue; 
+        }
+        else {
+            if (allTag.length) chosenList = allTag;
+            else if (typeMatch.length) chosenList = typeMatch;
+            else if (movesetMatch.length) chosenList = movesetMatch;
+            else continue;
+        }
+
+        if (!Array.isArray(chosenList) || chosenList.length === 0) continue;
+
+        const chosenMove = chosenList[Math.floor(Math.random() * chosenList.length)];
+
+        return move[chosenMove].id;
+    }
 }
+
+
+
+
+
+function learnPkmnAbility(id) {
+    const types = pkmn[id].type;
+
+    // Tier simple
+    let tier = 1;
+    if (rng(0.20)) tier = 2;
+    else if (rng(0.08)) tier = 3;
+
+    // Filtrar habilidades que coincidan por tipo o incluyan "all"
+    const pool = Object.keys(ability).filter(a => {
+        const ab = ability[a];
+        if (ab.rarity !== tier) return false;
+
+        // ab.type es un array → mirar si incluye "all" o si comparte tipo con el Pokémon
+        return ab.type.includes("all") || ab.type.some(t => types.includes(t));
+    });
+
+    // Elegir una aleatoria del pool
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+
+    return pick;
+}
+
 
 
 

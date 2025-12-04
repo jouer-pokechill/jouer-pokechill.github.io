@@ -3603,7 +3603,7 @@ pkmn.happiny = {
         sdef: 65,
         spe: 30,
     },
-    evolve: function() { return { 1: { pkmn: pkmn.chansey, happiness: true } } },
+    evolve: function() { return { 1: { pkmn: pkmn.chansey, item: item.ovalStone } } },
 }
 
 pkmn.chansey = {

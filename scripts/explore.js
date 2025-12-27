@@ -525,6 +525,8 @@ function leaveCombat(){
     transition()
     exploreCombatWildTurn = 0
 
+    console.log(saved.lastAreaJoined)
+
 
     if (document.getElementById(`menu-button`).classList.contains(`menu-button-open`)) openMenu()
 
@@ -802,6 +804,8 @@ function rejoinArea(){
 
     
     setTimeout(() => {
+            saved.currentArea = saved.lastAreaJoined
+
                     document.getElementById(`explore-menu`).style.display = `none`
                     document.getElementById(`vs-menu`).style.display = `none`
 
@@ -6298,4 +6302,3 @@ window.addEventListener('load', function() {
 
     //updateTeamExp()
 });
-

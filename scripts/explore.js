@@ -229,9 +229,7 @@ for (let i = 0; i < 4; i++) {
     }
 }
 
-    hpMultiplier = 5 + Math.floor(saved.currentSpiralFloor / 5);
-
-
+    hpMultiplier = 5 + Math.floor(saved.currentSpiralFloor / 3);
 
     }
     else if (areas[saved.currentArea].trainer) {
@@ -2673,7 +2671,11 @@ function typeEffectiveness(attacking, defending) {
     fairy:   { fire: resist, fighting: effective, poison: resist, dragon: effective, dark: effective, steel: resist }
   };
 
-  return defending.reduce((mul, defType) => mul * (chart[attacking]?.[defType] ?? 1), 1);
+  const result = defending.reduce((mul, defType) => mul * (chart[attacking]?.[defType] ?? 1), 1);
+
+  if (saved.currentArea == areas.frontierSpiralingTower.id && result==0) return 0.5 
+
+  return result
 }
 
 function returnTypeMultipliers(pkmn) {
@@ -4683,22 +4685,30 @@ function updateVS() {
 updateVS()
 
 saved.lastFrontierRotation = undefined
+saved.lastTowerRotation = undefined
 saved.currentSpiralFloor = 1
 saved.maxSpiralFloor = 1
 saved.spiralRewardsClaimed = 0
 
 saved.currentSpiralingType = `normal`
 
-function createFrontierTrainers(){
 
-    if (saved.lastFrontierRotation == rotationWildCurrent) return
-    if (saved.lastFrontierRotation != rotationWildCurrent) { saved.lastFrontierRotation = rotationWildCurrent }
+function resetSpiralingTower(){
+
+    if (saved.lastTowerRotation == rotationEventCurrent) return
+    if (saved.lastTowerRotation != rotationEventCurrent) { saved.lastTowerRotation = rotationEventCurrent }
 
     saved.spiralRewardsClaimed = 0
     saved.maxSpiralFloor = 1    
     saved.currentSpiralingType = arrayPick([`normal`,`fire`,`water`,`grass`,`bug`,`poison`,`dark`,`ghost`,`psychic`,`fighting`,`flying`,`dragon`,`fairy`,`steel`,`ground`,`rock`,`electric`,`ice`])
    
-    
+}
+
+function createFrontierTrainers(){
+
+    if (saved.lastFrontierRotation == rotationWildCurrent) return
+    if (saved.lastFrontierRotation != rotationWildCurrent) { saved.lastFrontierRotation = rotationWildCurrent }
+
 
 const trainers = [];
 
@@ -4868,7 +4878,7 @@ function updateFrontier() {
 
 
     createFrontierTrainers()
-
+    resetSpiralingTower()
     document.getElementById(`frontier-listing`).innerHTML = ""
 
         document.getElementById("vs-selector").innerHTML = `

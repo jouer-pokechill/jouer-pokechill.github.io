@@ -52,7 +52,6 @@ function openAutoTeam(){
     ` 
 
     setAutoTeamBiasFromPercent(50)
-    initAutoTeamBiasSlider()
 
     openTooltip()
 }

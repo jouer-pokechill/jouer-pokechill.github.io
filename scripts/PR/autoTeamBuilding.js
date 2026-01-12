@@ -32,6 +32,11 @@ function openAutoTeam(){
                 step="5"
                 value="50"
               />
+
+              <label style="display:flex; align-items:center; gap:.5rem; font-size:0.9rem;">
+                <input id="settings-auto-team-lock-items" type="checkbox" />
+                Lock items (preserve items during auto-build)
+              </label>
     </div>
 
     <div onClick = '
@@ -291,12 +296,14 @@ function autoBuildTeam() {
   for (let i = 1; i <= 6; i++) {
     const slotKey = `slot${i}`
     const newPkmn = optimizedTeam[i - 1]
+    const lockItems = document.getElementById("settings-auto-team-lock-items")?.checked === true
 
     if (newPkmn) {
       currentTeam[slotKey].pkmn = newPkmn
+      if (!lockItems) currentTeam[slotKey].item = undefined
     } else {
       currentTeam[slotKey].pkmn = undefined
-      currentTeam[slotKey].item = undefined
+      if (!lockItems) currentTeam[slotKey].item = undefined
     }
   }
 

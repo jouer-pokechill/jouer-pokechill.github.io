@@ -19,7 +19,9 @@
     <div onclick="changeTheme('verdant')">Verdant Theme</div>
     <div onclick="changeTheme('lilac')">Lilac Theme</div>
     <div onclick="changeTheme('cherry')">Cherry Theme</div>
+    <div onclick="changeTheme('coral')">Coral Theme</div>
     <div onclick="changeTheme('onyx')">Onyx Theme</div>
+    <div onclick="changeTheme('oled')">Oled Theme</div>
 
 
     </div>
@@ -128,34 +130,7 @@
 
 
 
-        <!-- PR: autoTeamBuilding.js
-        <div class="team-header-button" id="auto-team-builder" onclick="autoBuildTeam()"> 
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M10 3a7 7 0 0 0-6.938 6.063A4.5 4.5 0 0 0 5.5 18h4.75a.75.75 0 0 0 0-1.5H5.5a3 3 0 1 1 0-6A.75.75 0 0 0 6.25 9A5.5 5.5 0 0 1 17.3 8.247a.75.75 0 0 0 .63 1.087A2.5 2.5 0 0 1 20.5 11.75V12a.75.75 0 0 0 1.5 0v-.25a4 4 0 0 0-3.399-3.95A7 7 0 0 0 10 3Zm2 7.25v1.196l-.755-.754a.75.75 0 1 0-1.06 1.06l.754.755H9.75a.75.75 0 0 0 0 1.5h1.19l-.754.754a.75.75 0 1 0 1.06 1.061L12 14.317v1.19a.75.75 0 0 0 1.5 0v-1.196l.755.754a.75.75 0 1 0 1.06-1.06l-.754-.755h1.19a.75.75 0 0 0 0-1.5h-1.196l.754-.754a.75.75 0 0 0-1.06-1.061l-.755.754v-1.19a.75.75 0 0 0-1.5 0Z"/></svg>
-        Auto-build team
-        </div>
-
-        <div style="display:flex; flex-direction:column; gap:.35rem;">
-              <div>
-                <span>Auto-team bias</span>
-              </div>
-              <div>
-                <strong id="settings-auto-team-label">Offense 60% / Defense 40%</strong>
-              </div>
-
-              <input
-                id="settings-auto-team-bias"
-                type="range"
-                min="0"
-                max="100"
-                step="5"
-                value="60"
-              />
-
-              <small style="opacity:.8;">
-                Left = full defense, Right = full offense
-              </small>
-        </div>
-        -->
+      
 
 
 
@@ -211,7 +186,7 @@
                 <option value="preview30">Team 30</option>
             </select>
 
-            <svg style="margin-right: 2.5rem; flex-shrink:0" onclick="openAutoTeam()" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="currentColor" d="M13.5 1a.5.5 0 0 1 .5.5V2h.5a.5.5 0 0 1 0 1H14v.5a.5.5 0 0 1-1 0V3h-.5a.5.5 0 0 1 0-1h.5v-.5a.5.5 0 0 1 .5-.5m-10 2a.5.5 0 0 1 .5.5V4h.5a.5.5 0 1 1 0 1H4v.5a.5.5 0 1 1-1 0V5h-.5a.5.5 0 0 1 0-1H3v-.5a.5.5 0 0 1 .5-.5m9 9a.5.5 0 0 0 0-1H12v-.5a.5.5 0 0 0-1 0v.5h-.5a.5.5 0 0 0 0 1h.5v.5a.5.5 0 0 0 1 0V12zM8.73 4.563a1.914 1.914 0 0 1 2.707 2.708l-7.17 7.17a1.914 1.914 0 0 1-2.707-2.708zm-.48 1.894L2.267 12.44a.914.914 0 0 0 1.293 1.293L9.543 7.75zm2 .586l.48-.48a.914.914 0 1 0-1.293-1.292l-.48.48z"/></svg>
+            <svg style="margin-right: 2.5rem; flex-shrink:0" id="auto-build-button" onclick="openAutoTeam()" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="currentColor" d="M13.5 1a.5.5 0 0 1 .5.5V2h.5a.5.5 0 0 1 0 1H14v.5a.5.5 0 0 1-1 0V3h-.5a.5.5 0 0 1 0-1h.5v-.5a.5.5 0 0 1 .5-.5m-10 2a.5.5 0 0 1 .5.5V4h.5a.5.5 0 1 1 0 1H4v.5a.5.5 0 1 1-1 0V5h-.5a.5.5 0 0 1 0-1H3v-.5a.5.5 0 0 1 .5-.5m9 9a.5.5 0 0 0 0-1H12v-.5a.5.5 0 0 0-1 0v.5h-.5a.5.5 0 0 0 0 1h.5v.5a.5.5 0 0 0 1 0V12zM8.73 4.563a1.914 1.914 0 0 1 2.707 2.708l-7.17 7.17a1.914 1.914 0 0 1-2.707-2.708zm-.48 1.894L2.267 12.44a.914.914 0 0 0 1.293 1.293L9.543 7.75zm2 .586l.48-.48a.914.914 0 1 0-1.293-1.292l-.48.48z"/></svg>
 
 
             <svg onclick="editTeamName()" style="flex-shrink:0" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m2.777 19.783l.607-4.162c.037-.272.161-.525.355-.72L15.5 3.124a1.26 1.26 0 0 1 1.19-.341a6.2 6.2 0 0 1 2.832 1.694a6.2 6.2 0 0 1 1.682 2.846a1.26 1.26 0 0 1-.341 1.19L9.089 20.275a1.26 1.26 0 0 1-.721.354l-4.161.607a1.264 1.264 0 0 1-1.43-1.454M13.275 5.364l5.363 5.363"/></svg>
@@ -325,7 +300,8 @@
 
             <select id="pokedex-filter-evolution">
                 <option value="all">evolution</option>
-                <option value="true">not evolved</option>
+                <option value="true">not evolved (all)</option>
+                <option value="level-only">not evolved (level)</option>
             </select>
 
             <select id="pokedex-filter-ability">
@@ -354,6 +330,7 @@
 
               <select id="pokedex-filter-tag">
                 <option value="all">tag</option>
+                <option value="none">none</option>
                 <option value="red">red</option>
                 <option value="orange">orange</option>
                 <option value="yellow">yellow</option>
@@ -363,6 +340,7 @@
                 <option value="teal">teal</option>
                 <option value="pink">pink</option>
                 <option value="magenta">magenta</option>
+                <option value="hidden">hidden</option>
             </select>
 
               <select id="pokedex-sort-filter">
@@ -427,17 +405,24 @@
                 <option value="lilac">lilac</option>
                 <option value="cherry">cherry</option>
                 <option value="onyx">onyx</option>
+                <option value="coral">coral</option>
+                <option value="oled">oled</option>
             </select></div>
 
-            <div>Tutorials: <select id="settings-tutorial">
+            <div>Hide non-new Pokemon got in summary: <select id="settings-hide-got">
+                <option value="false">disabled</option>
+                <option value="true">enabled</option>
+            </select></div>
+
+            <!--<div>Tutorials: <select id="settings-tutorial">
                 <option value="enabled">enabled</option>
                 <option value="disabled">disabled</option>
-            </select></div>
+            </select></div>-->
 
             <div onclick='document.getElementById("tooltipTop").style.display = `none`
         document.getElementById("tooltipTitle").innerHTML = `Credits`
         document.getElementById("tooltipMid").style.display = `none`
-        document.getElementById("tooltipBottom").innerHTML = `Made by Duck<br><br>Pokemon and trainer sprites by Pokemon Showdown (Including artists: Beliot419, kyledove, Gnomowladny, Brumirage and ZacWeavile. Go check their work. Now.)<br><br>All characters and related assets featured in this game are the exclusive property of Nintendo, Creatures Inc., and The Pokémon Company, and are used here strictly for non-commercial purposes.`
+        document.getElementById("tooltipBottom").innerHTML = `Made by Duck<br><br>Pokemon and trainer sprites by Pokemon Showdown (Including artists: Beliot419, kyledove, Gnomowladny, Brumirage and ZacWeavile. Go check their work. Now.)<br><br>Gen 9 sprites by KingOfThe-X-Roads<br><br>All characters and related assets featured in this game are the exclusive property of Nintendo, Creatures Inc., and The Pokémon Company, and are used here strictly for non-commercial purposes.`
         openTooltip()' >Credits</div>
             <div onclick="window.open('https://discord.gg/VnukKfSs3S', '_blank')">Discord</div>
 
@@ -519,10 +504,75 @@ Game Guide
 
 
 
+    <div id="training-menu" style="display: none;">
+
+        
+
+    <div id="training-menu-header">
+    <div style="display:flex; gap:0.2rem" >
+    <span >
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"><path d="M9.102 13.727c.032-1.321.78-2.503 2.092-2.656c.378-.043.812-.071 1.306-.071s.928.028 1.306.072c1.313.152 2.06 1.334 2.092 2.655c.047 1.944.102 5.29.102 10.273s-.055 8.329-.102 10.273c-.032 1.321-.78 2.503-2.092 2.656c-.378.043-.812.071-1.306.071s-.928-.028-1.306-.071c-1.313-.153-2.06-1.335-2.092-2.656C9.055 32.329 9 28.983 9 24s.055-8.329.102-10.273m29.796 0c-.032-1.321-.78-2.503-2.092-2.656c-.378-.043-.812-.071-1.306-.071s-.928.028-1.306.072c-1.313.152-2.06 1.334-2.092 2.655C32.055 15.671 32 19.017 32 24s.055 8.329.102 10.273c.032 1.321.78 2.503 2.092 2.656c.378.043.812.071 1.306.071s.928-.028 1.306-.071c1.313-.153 2.06-1.335 2.092-2.656c.047-1.944.102-5.29.102-10.273s-.055-8.329-.102-10.273"/><path d="M15.993 26.982a1293 1293 0 0 0 16.014-.013m-.001-5.939c-2.414-.017-5.4-.03-9.007-.03c-2.668 0-4.998.007-7.007.018M3.055 18.803c.036-1.49.984-2.748 2.474-2.796a15 15 0 0 1 .942 0c1.49.048 2.438 1.305 2.474 2.796C8.975 20.026 9 21.739 9 24s-.026 3.974-.055 5.197c-.036 1.49-.984 2.748-2.474 2.796a15 15 0 0 1-.942 0c-1.49-.048-2.438-1.305-2.474-2.796C3.025 27.974 3 26.261 3 24s.026-3.974.055-5.197m41.89 0c-.036-1.49-.984-2.748-2.474-2.796a15 15 0 0 0-.942 0c-1.49.048-2.438 1.305-2.474 2.796C39.025 20.026 39 21.739 39 24s.026 3.974.055 5.197c.036 1.49.984 2.748 2.474 2.796a15 15 0 0 0 .942 0c1.49-.048 2.438-1.305 2.474-2.796c.03-1.223.055-2.936.055-5.197s-.026-3.974-.055-5.197"/></g></svg>
+    Training
+    </span>
+    <span class="header-help" data-help="Training"><svg  style="opacity:0.8; pointer-events:none" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><g fill="currentColor"><g opacity="0.2"><path d="M12.739 17.213a2 2 0 1 1-4 0a2 2 0 0 1 4 0"/><path fill-rule="evenodd" d="M10.71 5.765c-.67 0-1.245.2-1.65.486c-.39.276-.583.597-.639.874a1.45 1.45 0 0 1-2.842-.574c.227-1.126.925-2.045 1.809-2.67c.92-.65 2.086-1.016 3.322-1.016c2.557 0 5.208 1.71 5.208 4.456c0 1.59-.945 2.876-2.169 3.626a1.45 1.45 0 1 1-1.514-2.474c.57-.349.783-.794.783-1.152c0-.574-.715-1.556-2.308-1.556" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10.71 9.63c.8 0 1.45.648 1.45 1.45v1.502a1.45 1.45 0 1 1-2.9 0V11.08c0-.8.649-1.45 1.45-1.45" clip-rule="evenodd"/><path fill-rule="evenodd" d="M14.239 8.966a1.45 1.45 0 0 1-.5 1.99l-2.284 1.367a1.45 1.45 0 0 1-1.49-2.488l2.285-1.368a1.45 1.45 0 0 1 1.989.5" clip-rule="evenodd"/></g><path d="M11 16.25a1.25 1.25 0 1 1-2.5 0a1.25 1.25 0 0 1 2.5 0"/><path fill-rule="evenodd" d="M9.71 4.065c-.807 0-1.524.24-2.053.614c-.51.36-.825.826-.922 1.308a.75.75 0 1 1-1.47-.297c.186-.922.762-1.696 1.526-2.236c.796-.562 1.82-.89 2.919-.89c2.325 0 4.508 1.535 4.508 3.757c0 1.292-.768 2.376-1.834 3.029a.75.75 0 0 1-.784-1.28c.729-.446 1.118-1.093 1.118-1.749c0-1.099-1.182-2.256-3.008-2.256m0 5.265a.75.75 0 0 1 .75.75v1.502a.75.75 0 1 1-1.5 0V10.08a.75.75 0 0 1 .75-.75" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12.638 8.326a.75.75 0 0 1-.258 1.029l-2.285 1.368a.75.75 0 1 1-.77-1.287l2.285-1.368a.75.75 0 0 1 1.028.258" clip-rule="evenodd"/></g></svg></span>
+    </div>
 
 
+    <div id="training-header-flex">
+
+        <div class="training-flex">
+
+            <div class="training-flex-1">
+            <div id="training-sprite-div" style="z-index: 10;"><img class="sprite-trim"  style="z-index: 1; transform-origin: bottom; margin-top: auto; position: absolute; bottom: 0rem;" src="img/pkmn/sprite/wobbuffet.png"></div>
+            <img style="animation: none; position: absolute; opacity: 0.4; width: 4.5rem; z-index: 3; transform: translateY(0.5rem); image-rendering: initial;" src="img/resources/pkmn-shadow.png">
+            </div>
+
+            <div class="training-flex-2">
+            <img src="img/resources/training-sack.png" id="training-sack">
+            </div>
 
 
+        </div>
+        
+    </div>
+    </div>
+
+
+    
+    <div id="training-list">
+
+        <div class="training-module">
+            <span>IV Training</span>
+            <strong>Difficulty: ★</strong>
+        </div>
+
+        <div class="training-module">
+            <span>EXP Training</span>
+            <strong>Difficulty: ★★★</strong>
+        </div>
+
+
+        <div class="training-module">
+            <span>Signature Move Training</span>
+            <strong>Difficulty: ★★★★</strong>
+        </div>
+
+        <div class="training-module">
+            <span>Ability Training</span>
+            <strong>Difficulty: ★★</strong>
+        </div>
+
+        <div class="training-module">
+            <span>Hidden Ability Training</span>
+            <strong>Difficulty: ★★★★</strong>
+        </div>
+
+    </div>
+
+
+    
+
+    </div>
 
 
 
@@ -587,13 +637,17 @@ Game Guide
             <!--<div class="genetics-overview-data"><span>% to swap sample's ability</span><div></div><span>12%</span></div>
             <div class="genetics-overview-data"><span>% to inherit sample's signature move</span><div></div><span>8%</span></div>
             <br> these require special items -->
+
             <div class="genetics-overview-data"><span>% to inherit sample's HP Iv's</span><div></div><span id="genetics-data-hp">5%</span></div>
             <div class="genetics-overview-data"><span>% to inherit sample's Attack Iv's</span><div></div><span id="genetics-data-atk">5%</span></div>
             <div class="genetics-overview-data"><span>% to inherit sample's S. Attack Iv's</span><div></div><span id="genetics-data-satk">5%</span></div>
             <div class="genetics-overview-data"><span>% to inherit sample's Defense Iv's</span><div></div><span id="genetics-data-def">5%</span></div>
             <div class="genetics-overview-data"><span>% to inherit sample's S. Defense Iv's</span><div></div><span id="genetics-data-sdef">5%</span></div>
             <div class="genetics-overview-data"><span>% to inherit sample's Speed Iv's</span><div></div><span id="genetics-data-spe">5%</span></div>
-
+            <div id="genetics-warning">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="28" d="M12 10l4 7h-8Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.4s" values="28;0"/></path><path d="M12 10l4 7h-8Z" opacity="0"><animate attributeName="d" begin="0.4s" dur="0.8s" keyTimes="0;0.25;1" repeatCount="indefinite" values="M12 10l4 7h-8Z;M12 4l9.25 16h-18.5Z;M12 4l9.25 16h-18.5Z"/><animate attributeName="opacity" begin="0.4s" dur="0.8s" keyTimes="0;0.1;0.75;1" repeatCount="indefinite" values="0;1;1;0"/></path></g></svg>
+                Warning, power cost too high! Only 5 out of 6 maximum IV's per stat will be inherited!
+            </div>
         </div>
 
         <div id="genetics-progress">
@@ -785,13 +839,23 @@ Game Guide
 
     <div id="area-end" style="display: none;">
 
-    <div class="pkmn-leave-exit" onClick='
+    <div class="pkmn-leave-exit" onClick=' saved.autoRefight = false;
     if (saved.tutorial && saved.tutorialStep === "battleEnd") {saved.tutorialStep = "none"; openTutorial()}
     voidAnimation("area-end","tooltipBoxAppear 0.2s reverse 1 ease-in");
     setTimeout(() => {document.getElementById("area-end").style.display = "none"}, 150);
     saveGame()'>
         <svg style="margin-right: 0.35rem;" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h11.175q.4 0 .763.15t.637.425l2.85 2.85q.275.275.425.638t.15.762V19q0 .825-.587 1.413T19 21zm7-3q1.25 0 2.125-.875T15 15t-.875-2.125T12 12t-2.125.875T9 15t.875 2.125T12 18m-5-8h7q.425 0 .713-.288T15 9V7q0-.425-.288-.712T14 6H7q-.425 0-.712.288T6 7v2q0 .425.288.713T7 10"/></svg>
         Save and exit
+    </div>
+
+        <div id="area-rejoin"  onClick='rejoinArea()'>
+        <svg style="margin-right:0.1rem" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6c0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.93 7.93 0 0 0 20 12c0-4.42-3.58-8-8-8m0 14c-3.31 0-6-2.69-6-6c0-1.01.25-1.97.7-2.8L5.24 7.74A7.93 7.93 0 0 0 4 12c0 4.42 3.58 8 8 8v3l4-4l-4-4z"/></svg>
+        Fight Again
+    </div>
+
+    <div id="area-refight"  onClick='autoRefight();'>
+    <svg style="margin-right:0.3rem" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 14 14"><path fill="currentColor" fill-rule="evenodd" d="M10.797 2.482a.61.61 0 0 1 0 .866L9.44 4.705h.924c1.393 0 2.305.572 2.845 1.343c.515.736.651 1.593.651 2.153c0 .561-.136 1.418-.651 2.154c-.54.77-1.452 1.342-2.845 1.342c-.948 0-1.695-.48-2.295-1.08c-.584-.584-1.093-1.347-1.56-2.046l-.019-.03c-.49-.734-.936-1.4-1.425-1.889c-.481-.48-.935-.721-1.429-.721c-1.01 0-1.54.39-1.84.82c-.327.466-.43 1.05-.43 1.45s.103.985.43 1.451c.3.43.83.82 1.84.82c.512 0 .982-.259 1.482-.775a.613.613 0 0 1 .88.852c-.612.632-1.379 1.148-2.362 1.148c-1.393 0-2.305-.571-2.845-1.342C.276 9.619.14 8.762.14 8.2s.137-1.418.651-2.153c.54-.77 1.452-1.343 2.845-1.343c.948 0 1.695.48 2.295 1.08c.584.585 1.093 1.348 1.56 2.047l.019.03c.49.734.936 1.4 1.425 1.889c.481.48.935.721 1.429.721c1.01 0 1.54-.39 1.84-.82c.327-.466.43-1.05.43-1.45s-.103-.986-.43-1.451c-.3-.43-.83-.82-1.84-.82H7.961a.613.613 0 0 1-.433-1.046L9.93 2.482a.61.61 0 0 1 .866 0" clip-rule="evenodd"/></svg>
+    Auto-Refight <span> (Requires an <img src="img/items/autoRefightTicket.png"> Auto-Refight Ticket)</span>
     </div>
     
     <div class="area-end-category" id="area-end-moves-title" style="display: none;"></div>
@@ -807,15 +871,7 @@ Game Guide
 
     </div>
 
-    <div id="area-rejoin"  onClick='rejoinArea()'>
-        <svg style="margin-right:0.1rem" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6c0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.93 7.93 0 0 0 20 12c0-4.42-3.58-8-8-8m0 14c-3.31 0-6-2.69-6-6c0-1.01.25-1.97.7-2.8L5.24 7.74A7.93 7.93 0 0 0 4 12c0 4.42 3.58 8 8 8v3l4-4l-4-4z"/></svg>
-        Fight Again
-    </div>
 
-    <!-- <div id="area-refight"  onClick='rejoinArea()'>
-    <svg style="margin-right:0.3rem" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 14 14"><path fill="currentColor" fill-rule="evenodd" d="M10.797 2.482a.61.61 0 0 1 0 .866L9.44 4.705h.924c1.393 0 2.305.572 2.845 1.343c.515.736.651 1.593.651 2.153c0 .561-.136 1.418-.651 2.154c-.54.77-1.452 1.342-2.845 1.342c-.948 0-1.695-.48-2.295-1.08c-.584-.584-1.093-1.347-1.56-2.046l-.019-.03c-.49-.734-.936-1.4-1.425-1.889c-.481-.48-.935-.721-1.429-.721c-1.01 0-1.54.39-1.84.82c-.327.466-.43 1.05-.43 1.45s.103.985.43 1.451c.3.43.83.82 1.84.82c.512 0 .982-.259 1.482-.775a.613.613 0 0 1 .88.852c-.612.632-1.379 1.148-2.362 1.148c-1.393 0-2.305-.571-2.845-1.342C.276 9.619.14 8.762.14 8.2s.137-1.418.651-2.153c.54-.77 1.452-1.343 2.845-1.343c.948 0 1.695.48 2.295 1.08c.584.585 1.093 1.348 1.56 2.047l.019.03c.49.734.936 1.4 1.425 1.889c.481.48.935.721 1.429.721c1.01 0 1.54-.39 1.84-.82c.327-.466.43-1.05.43-1.45s-.103-.986-.43-1.451c-.3-.43-.83-.82-1.84-.82H7.961a.613.613 0 0 1-.433-1.046L9.93 2.482a.61.61 0 0 1 .866 0" clip-rule="evenodd"/></svg>
-    Auto-Refight
-    </div> -->
 
 
     </div>
@@ -866,10 +922,11 @@ Game Guide
                 <option value="yellow">yellow</option>
                 <option value="green">green</option>
                 <option value="lime">lime</option>
-                <option value="teal">teal</option>
                 <option value="blue">blue</option>
+                <option value="teal">teal</option>
                 <option value="pink">pink</option>
                 <option value="magenta">magenta</option>
+                <option value="hidden">hidden</option>
             </select>            
         </div>
 
@@ -944,7 +1001,21 @@ Game Guide
 
 
 
+
+
         <span id="pkmn-editor-extra-info"></span>
+
+
+
+                    <div id="pkmn-stats-lore">
+
+                    <div onclick="if (document.getElementById('pkmn-stats-lore-info').style.maxHeight == '10rem') {document.getElementById('pkmn-stats-lore-info').style.maxHeight = '0rem'; document.getElementById('pkmn-stats-lore-info').style.padding = '0rem'; return} document.getElementById('pkmn-stats-lore-info').style.maxHeight = '10rem'; document.getElementById('pkmn-stats-lore-info').style.padding = '0.5rem';">Expand Lore
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none"><path fill="currentColor" fill-opacity="0.25" fill-rule="evenodd" d="M2.455 11.116C3.531 9.234 6.555 5 12 5c5.444 0 8.469 4.234 9.544 6.116c.221.386.331.58.32.868c-.013.288-.143.476-.402.852C20.182 14.694 16.706 19 12 19s-8.182-4.306-9.462-6.164c-.26-.376-.39-.564-.401-.852c-.013-.288.098-.482.318-.868M12 15a3 3 0 1 0 0-6a3 3 0 0 0 0 6" clip-rule="evenodd"/><path stroke="currentColor" stroke-width="1.2" d="M12 5c-5.444 0-8.469 4.234-9.544 6.116c-.221.386-.331.58-.32.868c.013.288.143.476.402.852C3.818 14.694 7.294 19 12 19s8.182-4.306 9.462-6.164c.26-.376.39-.564.401-.852s-.098-.482-.319-.868C20.47 9.234 17.444 5 12 5Z"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.2"/></g></svg>
+                    </div>
+                    <span id="pkmn-stats-lore-info"  >
+                    Shaped by the Original One, when the universe was yet unmeasured, It was brought forth to give form to expanse. By its existence, space became vast; by its will, distance gained meaning. Without It, the world would have no breadth, no separation between sky and land, nor any path for life to walk.
+                    </span>
+                </div>
 
            
 
@@ -1051,19 +1122,21 @@ Game Guide
             <span>Poke-Mart</span>
         </div>
 
+        <div class="menu-item" id="menu-item-training" onClick="switchMenu('training')">
+            <img src="img/items/blackBelt.png">
+            <span>Training</span>
+        </div>
+
         <div class="menu-item" id="menu-item-genetics" onClick="switchMenu('genetics')">
             <img src="img/items/dnaSplicer.png">
             <span>Genetics</span>
         </div>
 
-        <div class="menu-item" id="menu-item-settings" onClick="switchMenu('settings')">
-            <img src="img/items/key.png">
-            <span>Settings</span>
-        </div>
 
-        <div class="menu-item" id="menu-item-guide" onClick="switchMenu('guide')">
-            <img src="img/items/tv.png">
-            <span>Guide</span>
+
+        <div class="menu-item" id="menu-mystery-gift" onClick="claimMysteryGift()">
+            <img src="img/items/gift.png">
+            <span>Mystery Gift</span>
         </div>
 
         <div class="menu-item" id="menu-export-reward" onClick="claimExportReward()">
@@ -1071,9 +1144,14 @@ Game Guide
             <span>Export Reward</span>
         </div>
 
-        <div class="menu-item" id="menu-mystery-gift" onClick="claimMysteryGift()">
-            <img src="img/items/gift.png">
-            <span>Mystery Gift</span>
+        <div class="menu-item" id="menu-item-guide" onClick="switchMenu('guide')">
+            <img src="img/items/tv.png">
+            <span>Guide</span>
+        </div>
+
+        <div class="menu-item" id="menu-item-settings" onClick="switchMenu('settings')">
+            <img src="img/items/key.png">
+            <span>Settings</span>
         </div>
 
         <div class="menu-item" id="menu-item-fullscreen" onclick="document.documentElement.requestFullscreen(); openMenu()">
@@ -1106,6 +1184,11 @@ Game Guide
                 <div id="spiraling-current-floor">Floor: 3</div>
                 <div id="spiraling-highest-floor"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><defs><mask id="SVGIz3eBe9X"><g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"><path d="M8 44h8m-4 0V4"/><path fill="#555555" d="M40 6H12v16h28l-4-8z"/></g></mask></defs><path fill="currentColor" d="M0 0h48v48H0z" mask="url(#SVGIz3eBe9X)"/></svg> Highest Floor: 3</div>
             </div>
+
+            <div id="training-indicator">
+                <div id="training-indicator-counter">20 Remaining</div>
+            </div>
+
             <div style="display: flex; width: 100%;">
 
             <div class="explore-sprite" id="explore-wild-sprite-data" style="cursor: help;">
@@ -1159,10 +1242,16 @@ Game Guide
             <div id="explore-drops">
             </div>
 
-            <div id="explore-leave" onclick="leaveCombat()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M5 5v14a1 1 0 0 0 1 1h3v-2H7V6h2V4H6a1 1 0 0 0-1 1m14.242-.97l-8-2A1 1 0 0 0 10 3v18a.998.998 0 0 0 1.242.97l8-2A1 1 0 0 0 20 19V5a1 1 0 0 0-.758-.97M15 12.188a1.001 1.001 0 0 1-2 0v-.377a1 1 0 1 1 2 .001z"/></svg>
+
+            <div id="auto-refight-info" onclick='saved.autoRefight = false; document.getElementById("auto-refight-info").style.display = "none" '>
+            
+            </div>
+
+            <div id="explore-leave" onclick="saved.autoRefight = false; leaveCombat()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="white" d="M5 5v14a1 1 0 0 0 1 1h3v-2H7V6h2V4H6a1 1 0 0 0-1 1m14.242-.97l-8-2A1 1 0 0 0 10 3v18a.998.998 0 0 0 1.242.97l8-2A1 1 0 0 0 20 19V5a1 1 0 0 0-.758-.97M15 12.188a1.001 1.001 0 0 1-2 0v-.377a1 1 0 1 1 2 .001z"/></svg>
                 Leave Combat
             </div>
+
 
 
 

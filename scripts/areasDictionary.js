@@ -302,10 +302,10 @@ areas.computeringLab = {
     level : wildAreaLevel4,
     type: `wild`,
     background : `lab`,
-    icon: pkmn.porygon,
+    icon: pkmn.beldum,
     spawns: {
         common : [pkmn.abra,pkmn.dedenne, pkmn.helioptile],
-        uncommon : [pkmn.porygon],
+        uncommon : [pkmn.klink],
         rare : [pkmn.beldum]
     },
     drops: {
@@ -1263,7 +1263,7 @@ areas.fierySummit = {
     },
     drops: {
         common : [item.nothing],
-        rare : [item.fieryRock]
+        uncommon : [item.fieryRock]
     },
 }
 
@@ -1437,7 +1437,7 @@ areas.primitiveGrove = {
     },
     drops: {
         common : [item.nothing],
-        rare : [item.ancientOrchid]
+        uncommon : [item.ancientOrchid]
     },
 }
 
@@ -1455,7 +1455,7 @@ areas.protonCity = {
     },
     drops: {
         common : [item.nothing],
-        rare : [item.futureDisk]
+        uncommon : [item.futureDisk]
     },
 }
 
@@ -1564,7 +1564,7 @@ areas.eventIronBundle = {
 areas.eventIronMoth = {
     rotation: 2,
     type: `event`,
-    name: `Iron Bundle Revival`,
+    name: `Iron Moth Revival`,
     background : `plant`,
     icon: pkmn.ironMoth,
     trainer: true,
@@ -2437,7 +2437,23 @@ areas.vsGymLeaderBrock = {
         slot6 : pkmn.aerodactyl,
         slot6Moves : [move.smackDown.id, move.gust.id],
     },
-    reward : [item.hardStone, item.goldenBottleCap]
+    reward : [item.hardStone, item.goldenBottleCap],
+    encounterEffect: function() {
+        document.getElementById("tooltipTop").style.display = `none`
+        document.getElementById("tooltipTitle").innerHTML = `New features unlocked!`
+        document.getElementById("tooltipBottom").style.display = `none`
+        document.getElementById("tooltipMid").innerHTML = `
+        <div class="genetics-overview-tags" >
+        <div style="filter:hue-rotate(100deg)" >New Wild Area unlocked</div>
+        <div style="filter:hue-rotate(0deg)" >New Dungeon: Sinnoh Underground</div>
+        <div style="filter:hue-rotate(0deg)" >New Dungeon: Beginner Training</div>
+        <div style="filter:hue-rotate(50deg)" >Mystery Gift unlocked</div>
+        <div style="filter:hue-rotate(200deg)" >Export Reward unlocked</div>
+        <div style="filter:hue-rotate(300deg)" >Poke-Mart unlocked</div>
+        </div>
+        `
+        openTooltip()
+    }
 }
 
 areas.vsBlackBeltRyan = {
@@ -2533,7 +2549,20 @@ areas.vsGymLeaderMisty = {
         slot6 : pkmn.starmie,
         slot6Moves : [move.psychic.id, move.auroraBeam.id, move.waterPulse.id],
     },
-    reward : [item.mysticWater, item.goldenBottleCap]
+    reward : [item.mysticWater, item.goldenBottleCap],
+    encounterEffect: function() {
+        document.getElementById("tooltipTop").style.display = `none`
+        document.getElementById("tooltipTitle").innerHTML = `New features unlocked!`
+        document.getElementById("tooltipBottom").style.display = `none`
+        document.getElementById("tooltipMid").innerHTML = `
+        <div class="genetics-overview-tags" >
+        <div style="filter:hue-rotate(100deg)" >New Wild Area unlocked</div>
+        <div style="filter:hue-rotate(0deg)" >New Dungeon: Advanced Training</div>
+        <div style="filter:hue-rotate(300deg)" >Training unlocked</div>
+        </div>
+        `
+        openTooltip()
+    }
 }
 
 areas.vsSwimmerDan = {
@@ -2629,8 +2658,21 @@ areas.vsGymLeaderPhoebe = {
         slot6 : pkmn.dragapult,
         slot6Moves : [move.dragonClaw.id, move.hex.id, move.shadowBall.id, move.dragonDance.id],
     },
-    reward : [item.spellTag, item.goldenBottleCap]
+    reward : [item.spellTag, item.goldenBottleCap],
+    encounterEffect: function() {
+        document.getElementById("tooltipTop").style.display = `none`
+        document.getElementById("tooltipTitle").innerHTML = `New features unlocked!`
+        document.getElementById("tooltipBottom").style.display = `none`
+        document.getElementById("tooltipMid").innerHTML = `
+        <div class="genetics-overview-tags" >
+        <div style="filter:hue-rotate(100deg)" >New Wild Area unlocked</div>
+        <div style="filter:hue-rotate(0deg)" >New Dungeon: Expert Training</div>
+        </div>
+        `
+        openTooltip()
+    }
 }
+
 
 areas.vsTwinTrainersBellisse = {
     name: `Twin Trainers Bellise`,
@@ -2726,7 +2768,20 @@ areas.vsEliteTrainerCynthia = {
         slot6 : pkmn.megaGarchomp,
         slot6Moves : [move.swordsDance.id, move.dragonTail.id, move.dragonRush.id, move.earthquake.id],
     },
-    reward : [item.dragonFang, item.goldenBottleCap]
+    reward : [item.dragonFang, item.goldenBottleCap],
+    encounterEffect: function() {
+        document.getElementById("tooltipTop").style.display = `none`
+        document.getElementById("tooltipTitle").innerHTML = `New features unlocked!`
+        document.getElementById("tooltipBottom").style.display = `none`
+        document.getElementById("tooltipMid").innerHTML = `
+        <div class="genetics-overview-tags" >
+        <div style="filter:hue-rotate(100deg)" >Tier I Event Raids unlocked</div>
+        <div style="filter:hue-rotate(0deg)" >New Dungeon: Victory Road</div>
+        <div style="filter:hue-rotate(50deg)" >Level Training unlocked</div>
+        </div>
+        `
+        openTooltip()
+    }
 }
 
 areas.vsEliteFourLorelei = {
@@ -2826,7 +2881,19 @@ areas.vsEliteFourLance = {
         slot6 : pkmn.rayquaza,
         slot6Moves : [move.dragonDance.id, move.fly.id, move.dragonClaw.id, move.flamethrower.id],
     },
-    reward : [item.luckIncense, item.goldenBottleCap]
+    reward : [item.luckIncense, item.goldenBottleCap],
+    encounterEffect: function() {
+        document.getElementById("tooltipTop").style.display = `none`
+        document.getElementById("tooltipTitle").innerHTML = `New features unlocked!`
+        document.getElementById("tooltipBottom").style.display = `none`
+        document.getElementById("tooltipMid").innerHTML = `
+        <div class="genetics-overview-tags" >
+        <div style="filter:hue-rotate(100deg)" >Tier II Event Raids unlocked</div>
+        <div style="filter:hue-rotate(0deg)" >Genetics unlocked</div>
+        </div>
+        `
+        openTooltip()
+    }
 }
 
 areas.vsTeamLeaderColress = {
@@ -2926,7 +2993,18 @@ areas.vsTeamLeaderGiovanni = {
         slot6 : pkmn.mewtwo,
         slot6Moves : [move.calmMind.id, move.psychic.id, move.shadowBall.id, move.confuseRay.id],
     },
-    reward : [item.abilityCapsule, item.goldenBottleCap]
+    reward : [item.abilityCapsule, item.goldenBottleCap],
+    encounterEffect: function() {
+        document.getElementById("tooltipTop").style.display = `none`
+        document.getElementById("tooltipTitle").innerHTML = `New features unlocked!`
+        document.getElementById("tooltipBottom").style.display = `none`
+        document.getElementById("tooltipMid").innerHTML = `
+        <div class="genetics-overview-tags" >
+        <div style="filter:hue-rotate(0deg)" >Battle Frontier unlocked</div>
+        </div>
+        `
+        openTooltip()
+    }
 }
 
 
@@ -3045,10 +3123,13 @@ areas.vsMasterTrainerGeeta = {
 //league 1
 
 
-const exclusiveFrontierPkmn = [pkmn.relicanth, pkmn.heatmor, pkmn.durant, pkmn.comfey, pkmn.morpeko, pkmn.klefki, pkmn.munna, pkmn.finneon,
-pkmn.skorupi, pkmn.stunky, pkmn.zangoose, pkmn.spinda, pkmn.gulpin, pkmn.zigzagoon, pkmn.teddiursa, pkmn.pineco, pkmn.shuckle, pkmn.minccino, pkmn.pincurchin, pkmn.stonjourner, pkmn.smeargle, pkmn.stantler, pkmn.thievul,
+const exclusiveFrontierPkmn = [
+    
+pkmn.relicanth, pkmn.heatmor, pkmn.durant, pkmn.comfey, pkmn.morpeko, pkmn.klefki, pkmn.munna, pkmn.finneon, pkmn.skorupi, pkmn.stunky, pkmn.zangoose, pkmn.gulpin,
+ pkmn.teddiursa, pkmn.pineco, pkmn.shuckle, pkmn.minccino, pkmn.pincurchin, pkmn.stonjourner, pkmn.smeargle, pkmn.stantler, pkmn.nickit, pkmn.porygon,
 
-pkmn.charmander, pkmn.squirtle, pkmn.bulbasaur, pkmn.chikorita, pkmn.cyndaquil, pkmn.totodile, pkmn.mudkip, pkmn.torchic, pkmn.treecko, pkmn.turtwig, pkmn.piplup, pkmn.chimchar, pkmn.tepig, pkmn.snivy, pkmn.oshawott, pkmn.froakie, pkmn.chespin, pkmn.fennekin, pkmn.rowlet, pkmn.litten, pkmn.popplio, pkmn.grookey, pkmn.scorbunny, pkmn.sobble,
+pkmn.charmander, pkmn.squirtle, pkmn.bulbasaur, pkmn.chikorita, pkmn.cyndaquil, pkmn.totodile, pkmn.mudkip, pkmn.torchic, pkmn.treecko, pkmn.turtwig, pkmn.piplup, pkmn.chimchar,
+pkmn.tepig, pkmn.snivy, pkmn.oshawott, pkmn.froakie, pkmn.chespin, pkmn.fennekin, pkmn.rowlet, pkmn.litten, pkmn.popplio, pkmn.grookey, pkmn.scorbunny, pkmn.sobble, pkmn.sprigatito, pkmn.fuecoco, pkmn.quaxly,
 
 pkmn.meltan
 
@@ -3665,6 +3746,102 @@ areas.frontierSpiralingTower = {
     floor : 1,
     icon: pkmn.pikachu,
 }
+
+
+
+
+const wildlifePoolCommon = [
+    
+    pkmn.lechonk.id, pkmn.tarountula.id, pkmn.nymble.id, pkmn.fidough.id, pkmn.smoliv.id,  pkmn.tadbulb.id, pkmn.shroodle.id, pkmn.bramblin.id, pkmn.capsakid.id, 
+    pkmn.flittle.id, pkmn.wiglett.id, pkmn.varoom.id, pkmn.glimmet.id, pkmn.greavard.id, pkmn.veluza.id,
+    
+    
+    pkmn.spearow.id, pkmn.nidoranF.id, pkmn.nidoranM.id, pkmn.vulpix.id, pkmn.venonat.id, pkmn.diglett.id, pkmn.psyduck.id,  pkmn.growlithe.id, pkmn.poliwag.id, 
+    pkmn.ponyta.id, pkmn.seel.id, pkmn.krabby.id, pkmn.staryu.id, pkmn.sentret.id, pkmn.hoothoot.id, pkmn.ledyba.id, pkmn.aipom.id, pkmn.mareep.id,  
+    pkmn.horsea.id, pkmn.phanpy.id, pkmn.wurmple.id, pkmn.lotad.id, pkmn.shroomish.id,  pkmn.minun.id, pkmn.budew.id, pkmn.barboach.id, pkmn.corphish.id, 
+    pkmn.duskull.id, pkmn.bidoof.id, pkmn.shinx.id, pkmn.burmy.id, pkmn.buizel.id, pkmn.cherubi.id,  pkmn.tympole.id, pkmn.sewaddle.id, 
+    pkmn.purrloin.id, pkmn.blitzle.id, pkmn.drilbur.id, pkmn.karrablast.id, pkmn.tynamo.id, pkmn.shelmet.id, pkmn.bunnelby.id, pkmn.flabebe.id, pkmn.skiddo.id, 
+    pkmn.dwebble.id, pkmn.tirtouga.id, pkmn.solosis.id, pkmn.pancham.id, pkmn.spritzee.id, pkmn.clauncher.id, pkmn.bergmite.id, pkmn.yungoos.id, 
+    pkmn.wishiwashi.id, pkmn.dewpider.id, pkmn.cutiefly.id, pkmn.fomantis.id, pkmn.morelull.id, pkmn.stufful.id, pkmn.bounsweet.id, pkmn.sandygast.id, pkmn.skwovet.id, pkmn.gossifleur.id, 
+    pkmn.yamper.id, pkmn.toxel.id, pkmn.indeedee.id, pkmn.cufant.id,
+
+
+    //fodder
+    pkmn.rattata.id, pkmn.zigzagoon.id, pkmn.starly.id, pkmn.pidgey.id, pkmn.patrat.id, pkmn.caterpie.id, pkmn.taillow.id, pkmn.lillipup.id,
+    pkmn.fletchling.id, pkmn.zubat.id, pkmn.poochyena.id, pkmn.pidove.id, pkmn.weedle.id, pkmn.rookidee.id, 
+    pkmn.pikipek.id, pkmn.spinarak.id, pkmn.hoppip.id, pkmn.wingull.id, pkmn.wooloo.id, pkmn.sunkern.id,
+    pkmn.scatterbug.id, pkmn.kricketot.id, pkmn.whismur.id,  pkmn.venipede.id, pkmn.blipbug.id, pkmn.pawmi.id,
+    pkmn.oddish.id, pkmn.bellsprout.id,pkmn.geodude.id, pkmn.magikarp.id, pkmn.marill.id, pkmn.wooper.id,
+    pkmn.seedot.id, pkmn.slakoth.id, pkmn.nincada.id, pkmn.skitty.id, pkmn.electrike.id,
+    pkmn.combee.id, pkmn.shellos.id, pkmn.roggenrola.id, pkmn.woobat.id, pkmn.timburr.id,
+    pkmn.litwick.id, pkmn.joltik.id, pkmn.foongus.id, pkmn.flabebe.id, pkmn.espurr.id, pkmn.honedge.id
+
+
+
+
+
+]
+
+const wildlifePoolUncommon = [
+    
+    pkmn.tandemaus.id, pkmn.maschiff.id, pkmn.klawf.id, pkmn.finizen.id, pkmn.orthworm.id,
+    
+    pkmn.lapras.id, pkmn.omanyte.id, pkmn.qwilfish.id, pkmn.happiny.id, pkmn.kecleon.id, pkmn.volbeat.id, pkmn.cranidos.id, pkmn.audino.id, pkmn.sawk.id, pkmn.crabrawler.id, 
+    pkmn.basculin.id, pkmn.emolga.id, pkmn.alomomola.id, pkmn.stunfisk.id, pkmn.komala.id, pkmn.clobbopus.id, pkmn.gligar.id, pkmn.inkay.id, pkmn.nacli.id, pkmn.glameow.id, 
+
+    //fodder
+    pkmn.ducklett.id, pkmn.tauros.id, pkmn.kabuto.id, pkmn.ditto.id, pkmn.dunsparce.id, pkmn.girafarig.id,
+    pkmn.miltank.id, pkmn.illumise.id, pkmn.castform.id, pkmn.tropius.id, pkmn.croagunk.id,
+    pkmn.throh.id, pkmn.maractus.id, pkmn.sigilyph.id, pkmn.druddigon.id,
+    pkmn.binacle.id, pkmn.helioptile.id, pkmn.carbink.id,pkmn.mudbray.id, pkmn.salandit.id,pkmn.togedemaru.id,
+    
+
+
+]
+
+const wildlifePoolRare = [
+    
+    pkmn.charcadet.id, pkmn.bombirdier.id, pkmn.cyclizar.id, pkmn.dondozo.id, pkmn.tatsugiri.id, pkmn.frigibax.id, pkmn.tinkatink.id,
+    
+    
+    pkmn.heracross.id, pkmn.skarmory.id, pkmn.absol.id, pkmn.feebas.id, pkmn.munchlax.id, pkmn.phione.id, pkmn.axew.id, pkmn.druddigon.id, pkmn.oranguru.id, pkmn.turtonator.id, 
+    pkmn.mimikyu.id, pkmn.dracozolt.id, pkmn.arctozolt.id, pkmn.dracovish.id, pkmn.arctovish.id, pkmn.duraludon.id, pkmn.cetoddle.id, pkmn.luvdisc.id, pkmn.aron.id, pkmn.meowth.id, 
+
+    //fodder
+    pkmn.aerodactyl.id, pkmn.dratini.id, pkmn.larvitar.id, pkmn.ralts.id, pkmn.mawile.id, pkmn.sableye.id, pkmn.bagon.id, pkmn.beldum.id,
+    pkmn.riolu.id, pkmn.gible.id, pkmn.spiritomb.id, pkmn.rotom.id, pkmn.zorua.id, pkmn.deino.id, pkmn.goomy.id, pkmn.noibat.id,
+    pkmn.jangmoo.id, pkmn.dhelmise.id, pkmn.passimian.id, pkmn.drampa.id, pkmn.dreepy.id, pkmn.eiscue.id,
+
+
+
+]
+
+areas.wildlifePark = {
+    level : wildAreaLevel1,
+    background : `forest`,
+    icon: pkmn.honedge,
+    spawns: {
+        common : [pkmn.kabuto,pkmn.koffing, pkmn.honedge],
+        uncommon : [pkmn.ditto],
+        rare : [pkmn.dreepy]
+    },
+    drops: {
+        common : [item.mysteryEgg]
+    }
+}
+
+
+
+
+
+
+
+
+areas.training = {
+    background: `gym`
+}
+
+
 
 
 for (const i in areas){

@@ -83,7 +83,7 @@ move.payDay = {
     split: "special",
     type: "normal",
     power: 0,
-    info: function() {return `Once used,increases the weight of rare item drops by 1% for the current battle. Multiple uses wont stack`},
+    info: function() {return `Once used,increases the weight of rare item drops by 1% for the current battle. Multiple uses wont stack. Works always for everyone regardless of the user`},
     hitEffect: function(target) { 
         saved.hasPayDayBeenUsed = true
     },
@@ -93,7 +93,7 @@ move.teatime = {
     split: "special",
     type: "normal",
     power: 0,
-    info: function() {return `Once used,increases the weight of rare Pokemon by 1% for the current battle. Multiple uses wont stack`},
+    info: function() {return `Once used,increases the weight of rare Pokemon by 1% for the current battle. Multiple uses wont stack. Works always for everyone regardless of the user`},
     hitEffect: function(target) { 
         saved.hasTeatimeBeenUsed = true
     },
@@ -143,6 +143,7 @@ move.burnUp = {
     power: t4Base+60,
     info: function() {return `Decreases Defense and Special Defense by 100%`},
     hitEffect: function(target) { moveBuff(target,'defdown2',"self"); moveBuff(target,'sdefdown2',"self"); },
+    unaffectedBySheerForce : true,
 }
 
 move.aquaStep = {
@@ -235,7 +236,6 @@ move.freezeDry = {
     split: "special",
     type: "ice",
     power: t4Base-20,
-    timer: defaultPlayerMoveTimer*1.5,
     info: function() {return `Super-effective against Water-types`} ,
 }
 
@@ -250,7 +250,7 @@ move.snowscape = {
 move.venoshock = {  
     split: "special",
     type: "poison",
-    power: t4Base+20/2,
+    power: (t4Base+20)/2,
     info: function() {return `Power doubles if the target is ${tagPoisoned}`},
     powerMod : function() { if (wildBuffs.poisoned>0 ) { return 2} else return 1 },
 }
@@ -327,6 +327,7 @@ move.iceHammer = {
     power: t4Base+20,
     info: function() {return `Decreases Speed by 50%`},
     hitEffect: function(target) { moveBuff(target,'spedown1','self') },
+    unaffectedBySheerForce : true,
 }
 
 move.dragonDarts = {  
@@ -727,7 +728,7 @@ move.thunderousKick = {
 move.meteorAssault = {
     split: "physical",
     type: "fighting",
-    power: t5Base+10*1.2,
+    power: (t5Base+10)*1.2,
     timer: defaultPlayerMoveTimer*1.2,
     info: function() {return `Attacks x1.2 slower than usual`} ,
 }
@@ -839,19 +840,17 @@ move.rageFist = {
     split: "physical",
     type: "ghost",
     power: t5Base/2,
-    info: function() {return `Multiplies move power by 1.2x everytime its used, up to 5 times. Depletes all stacks upon switching`},
+    info: function() {return `Multiplies move power by 1.2x everytime its used, up to 5 times. Depletes all stacks upon switching Pokemon`},
     buildup: 0,
     powerMod : function() { return 1 * Math.pow(1.2,this.buildup) },
     hitEffect: function(target) { if (this.buildup<5) this.buildup++;    },
 }
 
 move.iceBall = {
-    moveset: [`ice`],
     split: "physical",
-    rarity: 2,
     type: "ice",
     power: t5Base/2,
-    info: function() {return `Multiplies move power by 1.2x everytime its used, up to 5 times. Depletes all stacks upon switching`},
+    info: function() {return `Multiplies move power by 1.2x everytime its used, up to 5 times. Depletes all stacks upon switching Pokemon`},
     buildup: 0,
     powerMod : function() { return 1 * Math.pow(1.2,this.buildup) },
     hitEffect: function(target) { if (this.buildup<5) this.buildup++; },
@@ -861,7 +860,7 @@ move.tripleAxel = {
     split: "physical",
     type: "ice",
     power: t5Base/2,
-    info: function() {return `Multiplies move power by 1.3x everytime its used, up to 3 times. Depletes all stacks upon switching`},
+    info: function() {return `Multiplies move power by 1.3x everytime its used, up to 3 times. Depletes all stacks upon switching Pokemon`},
     buildup: 0,
     powerMod : function() { return 1 * Math.pow(1.3,this.buildup) },
     hitEffect: function(target) { if (this.buildup<3) this.buildup++;   },
@@ -871,7 +870,7 @@ move.attackOrder = {
     split: "physical",
     type: "bug",
     power: t5Base/3,
-    info: function() {return `Multiplies move power by 1.15x everytime its used, up to 10 times. Depletes all stacks upon switching`},
+    info: function() {return `Multiplies move power by 1.15x everytime its used, up to 10 times. Depletes all stacks upon switching Pokemon`},
     buildup: 0,
     powerMod : function() { return 1 * Math.pow(1.15,this.buildup) },
     hitEffect: function(target) { if (this.buildup<10) this.buildup++;  },
@@ -914,6 +913,7 @@ move.vCreate = {
     power: t5Base+30,
     info: function() {return `Decreases Defense, Special Defense and Speed by 50%`},
     hitEffect: function(target) { moveBuff(target,'defdown1',`self`); moveBuff(target,'sdefdown1',`self`); moveBuff(target,'spedown1',`self`); },
+    unaffectedBySheerForce : true,
 }
 
 move.headlongRush = {
@@ -922,6 +922,7 @@ move.headlongRush = {
     power: t4Base+20,
     info: function() {return `Decreases Defense by 50%`},
     hitEffect: function(target) { moveBuff(target,'defdown1',`self`) },
+    unaffectedBySheerForce : true,
 }
 
 move.sandsearStorm = {
@@ -1168,8 +1169,8 @@ move.gigaImpact = {
     info: function() {return `Attacks x1.5 slower than usual`} ,
 }
 
-move.swordsDance = {
-    moveset: [`normal`, `all`],
+move.swordsDance = { //edit
+    moveset: [`normal`, `steel`],
     split: "special",
     rarity: 3,
     type: "normal",
@@ -1252,7 +1253,7 @@ move.willOWisp = {
 move.sunnyDay = { 
     moveset: [`fire`,`ground`],
     split: "special",
-    rarity: 2,
+    rarity: 3,
     type: "fire",
     power: 0,
     info: function() {return `Changes the weather to ${tagSunny}`} ,
@@ -1308,6 +1309,7 @@ move.overheat = {
     power: 130,
     info: function() {return `Decreases Special Attack by 100%`},
     hitEffect: function(target) { moveBuff(target,'satkdown2','self') },
+    unaffectedBySheerForce : true,
 }
 
 
@@ -1781,7 +1783,7 @@ move.poisonSting = {
     split: "physical",
     rarity: 1,
     type: "poison",
-    power: 15,
+    power: 35,
     info: function() {return `10% chance to inflict ${tagPoisoned}`},
     hitEffect: function(target) { if (rng(0.10)) moveBuff(target,'poisoned') },
 }
@@ -2040,8 +2042,8 @@ move.twineedle = {
     rarity: 1,
     type: "bug",
     power: 25,
-    info: function() {return `10% chance to inflict ${tagPoisoned}`},
-    hitEffect: function(target) { if (rng(0.10)) moveBuff(target,'poisoned') },
+    info: function() {return `Hits 2 times`},
+    multihit: [2,2],
 }
 
 move.furyCutter = { 
@@ -2050,7 +2052,7 @@ move.furyCutter = {
     rarity: 1,
     type: "bug",
     power: 25,
-    info: function() {return `Multiplies move power by 1.2x everytime its used, up to 5 times. Depletes all stacks upon switching`},
+    info: function() {return `Multiplies move power by 1.2x everytime its used, up to 5 times. Depletes all stacks upon switching Pokemon`},
     buildup: 0,
     powerMod : function() { return 1 * Math.pow(1.2,this.buildup) },
     hitEffect: function(target) { if (this.buildup<5) this.buildup++;   },
@@ -2156,7 +2158,7 @@ move.stringShot = {
     rarity: 3,
     type: "bug",
     power: 0,
-    info: function() {return `Decreases enemy Speed by 100%`},
+    info: function() {return `Decreases enemy Speed by 75%`},
     hitEffect: function(target) { moveBuff(target,'spedown2') },
 }
 
@@ -2220,15 +2222,7 @@ move.chillingWater = {
     hitEffect: function(target) { moveBuff(target,'atkdown1') },
 }
 
-move.rainDance = { 
-    moveset: [`water`],
-    split: "special",
-    rarity: 2,
-    type: "water",
-    power: 0,
-    info: function() {return `Changes the weather to ${tagRainy}`} ,
-    hitEffect: function(target) { changeWeather("rainy") },
-}
+
 
 move.bubbleBeam = {
     moveset: [`water`],
@@ -2238,6 +2232,16 @@ move.bubbleBeam = {
     power: 65,
     info: function() {return `10% chance to decrease enemy Speed by 50%`},
     hitEffect: function(target) { if (rng(0.10)) moveBuff(target,'spedown1') },
+}
+
+move.rainDance = { 
+    moveset: [`water`],
+    split: "special",
+    rarity: 3,
+    type: "water",
+    power: 0,
+    info: function() {return `Changes the weather to ${tagRainy}`} ,
+    hitEffect: function(target) { changeWeather("rainy") },
 }
 
 move.waterfall = {
@@ -2409,7 +2413,7 @@ move.cottonSpore = {
     rarity: 3,
     type: "grass",
     power: 0,
-    info: function() {return `Decreases enemy Speed by 100%`},
+    info: function() {return `Decreases enemy Speed by 75%`},
     hitEffect: function(target) { moveBuff(target,'spedown2') },
 }
 
@@ -2535,6 +2539,7 @@ move.hammerArm = {
     power: 90,
     info: function() {return `Decreases Speed by 50%`},
     hitEffect: function(target) { moveBuff(target,'spedown1','self') },
+    unaffectedBySheerForce : true,
 }
 
 move.auraSphere = {
@@ -2571,6 +2576,7 @@ move.closeCombat = {
     power: 120,
     info: function() {return `Decreases Defense and Special Defense by 50%`},
     hitEffect: function(target) { moveBuff(target,'defdown1','self'); moveBuff(target,'sdefdown1','self') },
+    unaffectedBySheerForce : true,
 }
 
 move.superpower = {  
@@ -2581,6 +2587,7 @@ move.superpower = {
     power: 120,
     info: function() {return `Decreases Defense and Attack by 50%`},
     hitEffect: function(target) { moveBuff(target,'defdown1','self'); moveBuff(target,'atkdown1','self') },
+    unaffectedBySheerForce : true,
 }
 
 move.focusBlast = {
@@ -2695,13 +2702,13 @@ move.barrier = {
     hitEffect: function(target) { moveBuff(target,'defup2',"self")},
 }
 
-move.agility = {
-    moveset: [`psychic`, `normal`],
+move.agility = { //edit
+    moveset: [`psychic`, `flying`, `bug`],
     split: "special",
     rarity: 3,
     type: "psychic",
     power: 0,
-    info: function() {return `Increases Speed by 100%`},
+    info: function() {return `Increases Speed by 75%`},
     hitEffect: function(target) { moveBuff(target,'speup2',"self")},
 }
 
@@ -2752,7 +2759,7 @@ move.rollout = {
     rarity: 2,
     type: "rock",
     power: 55,
-    info: function() {return `Multiplies move power by 1.2x everytime its used, up to 5 times. Depletes all stacks upon switching`},
+    info: function() {return `Multiplies move power by 1.2x everytime its used, up to 5 times. Depletes all stacks upon switching Pokemon`},
     buildup: 0,
     powerMod : function() { return 1 * Math.pow(1.2,this.buildup) },
     hitEffect: function(target) { if (this.buildup<5) this.buildup++;   },
@@ -2817,7 +2824,7 @@ move.rockPolish = {
     rarity: 3,
     type: "rock",
     power: 0,
-    info: function() {return `Increases Speed by 100%`},
+    info: function() {return `Increases Speed by 75%`},
     hitEffect: function(target) { moveBuff(target,'speup2',"self")},
 }
 
@@ -2990,6 +2997,7 @@ move.dracoMeteor = {
     power: 130,
     info: function() {return `Decreases Special Attack by 100%`},
     hitEffect: function(target) { moveBuff(target,'satkdown2','self') },
+    unaffectedBySheerForce : true,
 }
 
 move.dragonDance = {
@@ -3126,7 +3134,7 @@ move.echoedVoice = {
     rarity: 2,
     type: "fairy",
     power: 50,
-    info: function() {return `Multiplies move power by 1.2x everytime its used, up to 5 times. Depletes all stacks upon switching`},
+    info: function() {return `Multiplies move power by 1.2x everytime its used, up to 5 times. Depletes all stacks upon switching Pokemon`},
     buildup: 0,
     powerMod : function() { return 1 * Math.pow(1.2,this.buildup) },
     hitEffect: function(target) { if (this.buildup<5) this.buildup++;   },
@@ -3831,7 +3839,7 @@ ability.strategist = {
 ability.sheerForce = {
     type: [`ground`, `steel`, `fighting`, `rock`],
     rarity: 3,
-    info: function() {return `Secondary effect of harmful moves are removed, and their power is multiplied by x1.2`},
+    info: function() {return `Positive secondary effect of damaging moves are removed, and their power is multiplied by x1.2`},
 }
 
 ability.levitate = {

@@ -53,13 +53,6 @@ function openAutoTeam(){
 
     setAutoTeamBiasFromPercent(50)
     initAutoTeamBiasSlider()
-    
-
-    //document.getElementById("team-name-field").addEventListener("keydown", e => {
-    //    if (e.key === "Enter") {
-    //    document.getElementById("team-name-field").blur()
-    //    }
-    //});
 
     openTooltip()
 }

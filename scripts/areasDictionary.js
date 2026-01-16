@@ -4722,5 +4722,4 @@ for (const i in areas){
         areas[i].unlockRequirement = function() { return areas.vsGymLeaderPhoebe.defeated }
     }
 
-
 }

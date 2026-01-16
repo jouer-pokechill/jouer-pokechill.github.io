@@ -157,7 +157,7 @@ function updateGameVersion() {
 
 
 
-  saved.version = 2.4
+  saved.version = 2.5
   document.getElementById(`game-version`).innerHTML = `v${saved.version}`
 }
 
@@ -537,7 +537,7 @@ guide.stats = {
 
 guide.abilities = {
   name: `Battle: Abilities`,
-  description: function() { return `Abilities are traits that a Pokemon can have. While they are randomised, some abilities can only appear on specific typings. Abilities are sorted in three categories; common, uncommon and rare<br><br>Hidden abilities are innate species-dependant traits that need to be unlocked with an Ability Capsule. Once unlocked, their effect will permanently be active alongside their other ability`}
+  description: function() { return `Abilities are traits that a Pokemon can have. While they are randomised, some abilities can only appear on specific typings. Abilities are sorted in three categories; common, uncommon and rare<br><br>Hidden abilities are innate species-dependant traits that need to be unlocked with an Ability Capsule. Once unlocked, their effect will permanently be active alongside their other ability. Same Hidden Ability and Ability wont stack with eachother`}
 }
 
 guide.experience = {
@@ -547,7 +547,7 @@ guide.experience = {
 
 guide.moves = {
   name: `Battle: Moves`,
-  description: function() { return `Moves are learnt every 7 levels. Moves can be switched by right click/long press on a team pokemon<br><br>Damaging moves are divided into physical and special moves<br>The category of the move determines whether the move's damage depends on the user's Attack or Special Attack stat and the target's Defense or Special Defense<br><br>Some Pokemon might have Signature Moves. Signature Moves are species-dependant moves that a Pokemon learn at level 100. Signature Moves can't be inherited through genetics`}
+  description: function() { return `Moves are learnt every 7 levels. Moves can be switched by right click/long press on a team pokemon<br><br>Damaging moves are divided into physical and special moves<br>The category of the move determines whether the move's damage depends on the user's Attack or Special Attack stat and the target's Defense or Special Defense<br><br>Some Pokemon might have Signature Moves. Signature Moves are species-dependant moves that a Pokemon learn at level 100. Signature Moves can't be inherited through genetics<br><br>Some moves might be restricted. Only one restricted move might be equipped at a time on the active Pokemon`}
 }
 
 guide.stab = {
@@ -706,5 +706,6 @@ function infoMisc(){
       {command:"debugGetPkmn(LEVEL,'shiny')", effect:"Get all Pokemon at certain level. Shiny is optional"},
       {command:"debugSetIvs(NUMBER)", effect:"Set all Pokemon IV's. Maximum 6"},
       {command:"saved.geneticOperation=1", effect:"Complete Genetics Operation"},
+      {command:"getMoveset(pkmn.NAME,LEVEL)", effect:"Generates a table of possible Pokemon moves"},
       ]);
 }

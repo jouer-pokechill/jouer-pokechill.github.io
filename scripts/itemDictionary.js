@@ -138,13 +138,13 @@ item.flameOrb = {
 
 item.toxicOrb = {
     type: "held",
-    info: function() {return `When held: Increases the damage of the user by x${this.power()}, but inflicts ${tagPoisoned}`},
+    info: function() {return `When held: Increases the Damage of the user by x${this.power()}, but inflicts ${tagPoisoned}`},
     power : function() { return 1+(0.15*returnItemLevel(this.id))}
 }
 
 item.choiceBand = {
     type: "held",
-    info: function() {return `When held: Increases the damage of the user by x${this.power()}, but prevents them from switching`},
+    info: function() {return `When held: Increases the Attack of the user by x${this.power()}, but prevents them from switching`},
     power : function() { return 1+(0.15*returnItemLevel(this.id))}
 }
 
@@ -1159,4 +1159,5 @@ function joinWithAnd(list) {
 
     return `${formatted.slice(0, -1).join(", ")}, and ${formatted[len - 1]}`;
 }
+
 

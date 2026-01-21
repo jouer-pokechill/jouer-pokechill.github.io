@@ -2155,7 +2155,7 @@ document.addEventListener("contextmenu", e => {
         if (el.dataset.help === `Shop`) document.getElementById("tooltipBottom").innerHTML = t("help.shop.body", "You can buy items here with Bottle Caps. Yeah")
 
         if (el.dataset.help === `Pokerus`) document.getElementById("tooltipTitle").innerHTML = t("help.pokerus.title", "Pokerus")
-        if (el.dataset.help === `Pokerus`) document.getElementById("tooltipBottom").innerHTML = t("help.pokerus.body", "Every 12 hours, some of your Pokemon will contract Pokerus. This virus is entirely beneficial, and will add one level of compatibility to the Pokemon in genetics when used as a host"
+        if (el.dataset.help === `Pokerus`) document.getElementById("tooltipBottom").innerHTML = t("help.pokerus.body", "Every 12 hours, some of your Pokemon will contract Pokerus. This virus is entirely beneficial, and will add one level of compatibility to the Pokemon in genetics when used as a host")
 
 
         if (el.dataset.help === `searchDictionary`) document.getElementById("tooltipTitle").innerHTML = t("help.keywords", "Keywords")

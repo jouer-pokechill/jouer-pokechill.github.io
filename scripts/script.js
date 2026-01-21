@@ -155,9 +155,13 @@ function updateGameVersion() {
   saved.tutorialStep = `none`
   }
 
+  if (saved.version<2.6){
+  saved.mysteryGiftClaimed = false
+  }
 
 
-  saved.version = 2.5
+
+  saved.version = 2.6
   document.getElementById(`game-version`).innerHTML = `v${saved.version}`
 }
 
@@ -536,12 +540,12 @@ function learnPkmnMoveSeeded(id, level, mod, seed, exclude = []) {
 
 
 //--Gives Pokemon appropiate abilities
-function learnPkmnAbility(id) {
+function learnPkmnAbility(id,boost=1) {
     const types = pkmn[id].type;
 
     let tier = 1;
-    if (rng(0.20)) tier = 2;
-    else if (rng(0.08)) tier = 3;
+    if (rng(0.20*boost)) tier = 2;
+    if (rng(0.06*boost)) tier = 3;
 
     const pool = Object.keys(ability).filter(a => {
         const ab = ability[a];
@@ -593,7 +597,7 @@ function openTutorial(){
 
   if (saved.tutorialStep == "intro") document.getElementById("tutorial-text").innerHTML = `Howdy! I have been assigned to show the ropes<br>Let's start by getting new pokemon shall we? Select "Travel" on the top left menu`
   if (saved.tutorialStep == "travel") document.getElementById("tutorial-text").innerHTML = `You can right click/long tap almost everything on the screen for more info! You can also do this within the info itself too. Try going into the first Wild Area to start catching Pokemon`
-  if (saved.tutorialStep == "moves") document.getElementById("tutorial-text").innerHTML = `Right click/long tap a pokemon in your team to set their moves, you can also do this while in battle. If you got any held items, you can also assign them here<br>Once you are ready, press Save and Go! at the top of the screen`
+  if (saved.tutorialStep == "moves") document.getElementById("tutorial-text").innerHTML = `Right click/long tap a pokemon in your team to set their moves, you can also do this while in battle. Press the + symbol next to the Pokemon to assign items<br>Once you are ready, press Save and Go! at the top of the screen`
   if (saved.tutorialStep == "battle") document.getElementById("tutorial-text").innerHTML = `Your team will automatically attack in a set pattern, even while you tab out or close the browser! You can right click/long press on moves or pokemon to see their stats aswell. Once you have more Pokemon in your team, you will be able to switch them arround in a fight`
   if (saved.tutorialStep == "battleEnd") {document.getElementById("tutorial-text").innerHTML = `You can check a more in-depth explanation about stats and battle mechanics in the Guide menu. For now, I will take a break... Enjoy your stay!`}
   document.getElementById("tutorial").style.display = "flex"
@@ -760,19 +764,18 @@ guide.shiny = {
   }
 }
 
-
 guide.genetics = {
-  nameKey: "guide.geneticsQuick.title",
-  name: "Genetics: Quick Guide",
-  descriptionKey: "guide.geneticsQuick.body",
-  description: function() {
-    return tGuide(
-      "guide.geneticsQuick.body",
-      "Genetics allows you to modify a Pokémon beyond what is considered normal for the species, here is a quick overview of what you can achieve with operations:<br><br>Shiny Mutation: You can inherit the shiny mutation, with a 100% chance, to members of the same family. You can also attempt to spread a new shiny mutation by using a shiny sample<br><br>IV Boosting: Simply by doing any operation, regardless of the compatibility, the IV's of the host will attempt to increase. Useful for Pokémon with little to no IV's<br><br>IV Inheriting: An advanced alternative to the previous. You can inherit IV's from a species to another depending on factors such as compatibility or genetic-aiding items used<br><br>Move Relearn: When completing an operation, all but the four selected moves of the host will be reset, meaning you can attempt to get stronger moves with each operation<br><br>Move Inheriting: An advanced alternative to the previous, you can inherit moves from the sample that would otherwise not be available to you through learning<br><br>Ability Relearn: When completing an operation, your ability will reset, unless you use an Everstone. This can be used to get more useful abilities in the process<br><br>Ability Inheriting: An advanced alternative to the previous. Using a Destiny Knot, you can swap abilities with the sample, getting access to otherwise-impossible combinations"
-    )
-  }
+  name: `Genetics: Quick Guide`,
+  description: function() { return `
+    Genetics allows you to modify a Pokemon beyond what is considered normal for the species, here is a quick overview of what you can achieve with operations:
+    <br><br>Shiny Mutation: You can inherit the shiny mutation, with a 100% chance, to members of the same family. You can also attempt to spread a new shiny mutation by using a shiny sample
+    <br><br>IV Boosting: Simply by doing any operation, regardless of the compatibility, the IV's of the host will attempt to increase. Useful for Pokemon with little to no IV's
+    <br><br>IV Inheriting: An advanced alternative to the previous. You can inherit IV's from a species to another depending on factors such as compatibility or genetic-aiding items used
+    <br><br>Move Relearn: When completing an operation, all but the four selected moves of the host will be reset, meaning you can attempt to get stronger moves with each operation
+    <br><br>Move Inheriting: An advanced alternative to the previous, you can inherit moves from the sample that would otherwise not be available to you through learning
+    <br><br>Ability Inheriting: Using a Destiny Knot, you can swap abilities with the sample, getting access to otherwise-impossible combinations
+    `}
 }
-
 
 guide.compatibility = {
   nameKey: "guide.compatibility.title",
@@ -785,7 +788,6 @@ guide.compatibility = {
     )
   }
 }
-
 
 guide.powerCost = {
   nameKey: "guide.powerCost.title",

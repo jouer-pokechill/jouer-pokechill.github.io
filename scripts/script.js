@@ -765,8 +765,12 @@ guide.shiny = {
 }
 
 guide.genetics = {
+  nameKey: "guide.geneticsQuick.title",
   name: `Genetics: Quick Guide`,
-  description: function() { return `
+  descriptionKey: "guide.geneticsQuick.body",
+  description: function() {
+    return tGuide(
+      "guide.geneticsQuick.body", `
     Genetics allows you to modify a Pokemon beyond what is considered normal for the species, here is a quick overview of what you can achieve with operations:
     <br><br>Shiny Mutation: You can inherit the shiny mutation, with a 100% chance, to members of the same family. You can also attempt to spread a new shiny mutation by using a shiny sample
     <br><br>IV Boosting: Simply by doing any operation, regardless of the compatibility, the IV's of the host will attempt to increase. Useful for Pokemon with little to no IV's
@@ -774,7 +778,8 @@ guide.genetics = {
     <br><br>Move Relearn: When completing an operation, all but the four selected moves of the host will be reset, meaning you can attempt to get stronger moves with each operation
     <br><br>Move Inheriting: An advanced alternative to the previous, you can inherit moves from the sample that would otherwise not be available to you through learning
     <br><br>Ability Inheriting: Using a Destiny Knot, you can swap abilities with the sample, getting access to otherwise-impossible combinations
-    `}
+    `);
+  }
 }
 
 guide.compatibility = {

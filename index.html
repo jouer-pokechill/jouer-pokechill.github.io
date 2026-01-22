@@ -466,7 +466,7 @@
                 <option value="true">enabled</option>
             </select></div>
 
-            <div><span data-i18n="settings.language">Language</span>: <select id="settings-language">
+            <div style="display: none;"><span data-i18n="settings.language">Language</span>: <select id="settings-language">
                 <option value="fr">Français</option>
                 <option value="en">English</option>
             </select></div>
@@ -494,7 +494,7 @@
 
 
 
-       <div id="disclaimer-menu" style="display: none;">
+       <div id="disclaimer-menu" style="display: none;" data-i18n-html="disclaimer.body">
         This project is entirely unofficial!
         <br><br>
         All characters and related intellectual property featured are the exclusive property of Nintendo, Creatures Inc., and The Pokémon Company.
@@ -506,23 +506,23 @@
 
        <div id="starter-menu" style="display: none;">
 
-        <span>Select a starter!</span>
+        <span data-i18n="starter.title">Select a starter!</span>
 
         <div class="starter-list">
 
             <div data-pkmn="litten" onClick="document.getElementById('starter-menu').style.pointerEvents = 'none'; item.charcoal.got++; givePkmn(pkmn.litten,10); voidAnimation('starter-menu','tooltipBoxAppear 0.2s 1 reverse'); setTimeout(() => { document.getElementById('starter-menu').style.display = 'none' }, 150); ">
-                <img src="img/pkmn/sprite/litten.png">Litten<br>Fire Type
+                <img src="img/pkmn/sprite/litten.png"><span data-i18n-html="starter.litten">Litten<br>Fire Type</span>
             </div>
 
             <div data-pkmn="turtwig" onClick="document.getElementById('starter-menu').style.pointerEvents = 'none'; item.miracleSeed.got++; givePkmn(pkmn.turtwig,10); voidAnimation('starter-menu','tooltipBoxAppear 0.2s 1 reverse'); setTimeout(() => { document.getElementById('starter-menu').style.display = 'none' }, 150); ">
-                <img src="img/pkmn/sprite/turtwig.png">Turtwig<br>Grass Type
+                <img src="img/pkmn/sprite/turtwig.png"><span data-i18n-html="starter.turtwig">Turtwig<br>Grass Type</span>
             </div>
 
             <div data-pkmn="froakie" onClick="document.getElementById('starter-menu').style.pointerEvents = 'none'; item.mysticWater.got++; givePkmn(pkmn.froakie,10); voidAnimation('starter-menu','tooltipBoxAppear 0.2s 1 reverse'); setTimeout(() => { document.getElementById('starter-menu').style.display = 'none' }, 150); ">
-                <img src="img/pkmn/sprite/froakie.png">Froakie<br>Water Type
+                <img src="img/pkmn/sprite/froakie.png"><span data-i18n-html="starter.froakie">Froakie<br>Water Type</span>
             </div>
 
-        <span style="color: white; background: transparent; padding: 0 2rem;">Tip: Right click (or long-press on mobile) on most elements for additional information</span>
+        <span style="color: white; background: transparent; padding: 0 2rem;" data-i18n="starter.tip">Tip: Right click (or long-press on mobile) on most elements for additional information</span>
 
         </div>
 

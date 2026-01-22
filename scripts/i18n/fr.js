@@ -714,7 +714,13 @@ window.i18nData.fr = {
     "moveset.section.movesetMatch": "Correspondances de tags de moveset",
     "moveset.section.allType": "Attaques tous types",
     "moveset.close": "Fermer",
-    "save.error.load": "Erreur lors du chargement des données."
+    "save.error.load": "Erreur lors du chargement des données.",
+    "disclaimer.body": "Ce projet est entièrement non officiel !<br><br>Tous les personnages et la propriété intellectuelle associée présentés sont la propriété exclusive de Nintendo, Creatures Inc. et The Pokémon Company.<br><br>L'utilisation des ressources est strictement réservée à un usage non commercial et de divertissement. Aucun droit de propriété n’est revendiqué et tous les droits restent à leurs détenteurs respectifs.<br><br>Allez jouer aux jeux officiels !",
+    "starter.title": "Choisissez un starter !",
+    "starter.tip": "Astuce : clic droit (ou appui long sur mobile) sur la plupart des éléments pour plus d'informations",
+    "starter.litten": "Flamiaou<br>Type Feu",
+    "starter.turtwig": "Tortipouss<br>Type Plante",
+    "starter.froakie": "Grenousse<br>Type Eau"
   },
   names: {
     pkmn: {

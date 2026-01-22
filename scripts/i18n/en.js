@@ -714,7 +714,13 @@ window.i18nData.en = {
     "moveset.section.movesetMatch": "Moveset Tag Matches",
     "moveset.section.allType": "All-Type Moves",
     "moveset.close": "Close",
-    "save.error.load": "Error loading data."
+    "save.error.load": "Error loading data.",
+    "disclaimer.body": "This project is entirely unofficial!<br><br>All characters and related intellectual property featured are the exclusive property of Nintendo, Creatures Inc., and The Pokémon Company.<br><br>Any use of assets is solely for non-commercial and entertainment purposes. No ownership is claimed, and all rights remain with their respective owners.<br><br>Go play the official games!",
+    "starter.title": "Select a starter!",
+    "starter.tip": "Tip: Right click (or long-press on mobile) on most elements for additional information",
+    "starter.litten": "Litten<br>Fire Type",
+    "starter.turtwig": "Turtwig<br>Grass Type",
+    "starter.froakie": "Froakie<br>Water Type"
   },
   names: {
     pkmn: {

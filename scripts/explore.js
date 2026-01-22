@@ -61,6 +61,24 @@ function voidAnimation(divName, animationName) {
 }
 
 function format(input) {
+    const i18n = window.i18n;
+    if (i18n?.tId) {
+        const localized =
+            (pkmn[input] && i18n.tId("pkmn", input)) ||
+            (move[input] && i18n.tId("move", input)) ||
+            (item[input] && i18n.tId("item", input)) ||
+            (ability[input] && i18n.tId("ability", input)) ||
+            i18n.tId("type", input) ||
+            i18n.tId("status", input) ||
+            i18n.tId("weather", input);
+        if (localized) return localized;
+    }
+
+    if (areas?.[input]) {
+        const areaFallback = areas[input].name ?? String(input);
+        return t(`areas.name.${input}`, areaFallback);
+    }
+
     let str = String(input);
     if (move[input]?.rename) str = String(move[input].rename);
     if (pkmn[input]?.rename) str = String(pkmn[input].rename);
@@ -75,6 +93,39 @@ function format(input) {
         .replace(/\b\w/g, c => c.toUpperCase())
         .replace(/Mega /gi, 'M. ');
 }
+
+function getAreaName(areaId, areaData) {
+    const area = areaData ?? areas?.[areaId];
+    const fallback = area?.name ?? format(areaId);
+    return t(`areas.name.${areaId}`, fallback);
+}
+
+function getUnlockDescription(area) {
+    const description = area?.unlockDescription;
+    if (!description) return "";
+
+    const itemMatch = description.match(/img\/items\/([a-zA-Z0-9_]+)\.png/);
+    if (!itemMatch) return description;
+
+    const itemId = itemMatch[1];
+    const countMatch = description.match(/x(\d+)/i);
+    const count = countMatch ? Number(countMatch[1]) : 1;
+    const itemIcon = `<img src="img/items/${itemId}.png">`;
+    const itemName = format(itemId);
+    const itemHtml = `${itemIcon} ${itemName}`;
+
+    if (count > 1) {
+        return t("explore.unlock.requiresItems", "Requires x{count} {item} to enter", {
+            count,
+            item: itemHtml
+        });
+    }
+
+    return t("explore.unlock.requiresItem", "Requires {item} to enter", {
+        item: itemHtml
+    });
+}
+
 
 /*function arrayPick(array, n = 1, seed) {
     if (!Array.isArray(array) || array.length === 0) return [];
@@ -227,7 +278,11 @@ function setWildPkmn(){
     if (saved.currentArea == areas.training.id) {
 
     document.getElementById(`training-indicator`).style.display = `flex`
-    document.getElementById(`training-indicator-counter`).textContent = `Remaining: ${currentTrainingWave}`
+    document.getElementById(`training-indicator-counter`).textContent = t(
+        "explore.training.remaining",
+        "Remaining: {count}",
+        { count: currentTrainingWave }
+    )
 
     returnPkmnDivision(pkmn[saved.trainingPokemon])
 
@@ -314,8 +369,17 @@ function setWildPkmn(){
 
     } else if (saved.currentArea == areas.frontierSpiralingTower.id) {
     document.getElementById(`spiraling-indicator`).style.display = `flex`
-    document.getElementById(`spiraling-highest-floor`).textContent = `Highest Floor: ${saved.maxSpiralFloor}`
-    document.getElementById(`spiraling-current-floor`).textContent = `Floor: ${saved.currentSpiralFloor}`
+    document.getElementById(`spiraling-highest-floor`).textContent = t(
+        "explore.spiral.highestFloor",
+        "Highest Floor: {floor}",
+        { floor: saved.maxSpiralFloor }
+    )
+    document.getElementById(`spiraling-current-floor`).textContent = t(
+        "explore.spiral.floor",
+        "Floor: {floor}",
+        { floor: saved.currentSpiralFloor }
+    )
+
     wildLevel = 98 + (2*saved.currentSpiralFloor)
 
     let divisionToUse = "C"
@@ -571,7 +635,7 @@ function updateItemsGot(){
         divItem.dataset.item = i
 
         if (item[i].type !== "tm") divItem.innerHTML = `<img src="img/items/${i}.png"> <span>x${item[i].newItem}</span>`;
-        if (item[i].type == "tm") divItem.innerHTML = `<img src="img/items/tm${format(move[item[i].move].type)}.png"> <span>x${item[i].newItem}</span>`;
+        if (item[i].type == "tm") divItem.innerHTML = `<img src="img/items/tm${move[item[i].move].type}.png"> <span>x${item[i].newItem}</span>`;
 
 
         document.getElementById("explore-drops").appendChild(divItem);
@@ -739,7 +803,11 @@ function leaveCombat(){
 
     if (storedAfkSeconds==0) document.getElementById("area-end-item-list").innerHTML = ""
     if (storedAfkSeconds==0) document.getElementById("area-end-pkmn-list").innerHTML = "";
-    document.getElementById("area-end-item-title").innerHTML = "New Items!"
+    document.getElementById("area-end-item-title").innerHTML = t(
+        "explore.areaEnd.newItems",
+        "New Items!"
+    )
+
 
     //spiraling tower rewards
     if (saved.currentSpiralFloor!==1 && (saved.currentSpiralFloor == saved.maxSpiralFloor)) {
@@ -790,7 +858,7 @@ function leaveCombat(){
         divItem.className = "area-end-item";
         divItem.dataset.item = i
         if (item[i].type !== "tm") divItem.innerHTML = `<img src="img/items/${i}.png"><span>+${item[i].newItem}</span>`;
-        if (item[i].type == "tm") divItem.innerHTML = `<img src="img/items/tm${format(move[item[i].move].type)}.png"><span>+${item[i].newItem}</span>`;
+        if (item[i].type == "tm") divItem.innerHTML = `<img src="img/items/tm${move[item[i].move].type}.png"><span>+${item[i].newItem}</span>`;
         document.getElementById("area-end-item-list").appendChild(divItem);
 
         item[i].newItem = 0;
@@ -830,8 +898,9 @@ function leaveCombat(){
 
     if (areas[saved.currentArea].spawns.common == undefined) hatchedPkmn = arrayPick(areas[saved.currentArea].spawns.rare).id
     
-    
     let divTag = ""
+    let isShinyTag = false
+
 
     for (const iv in pkmn[hatchedPkmn].ivs){
         const ivId = pkmn[hatchedPkmn].ivs[iv]
@@ -849,7 +918,7 @@ function leaveCombat(){
 
         if (newIv>ivId) {
             pkmn[hatchedPkmn].ivs[iv] = newIv
-             divTag = `<span>Iv's Up!</span>`
+             divTag = `<span>${t("explore.areaEnd.ivsUp", "IVs Up!")}</span>`
         }
     }
 
@@ -858,14 +927,16 @@ function leaveCombat(){
         pkmn[hatchedPkmn].movepool.push(newMove)
         pkmn[hatchedPkmn].moves.slot1 = newMove 
         pkmn[hatchedPkmn].ability = learnPkmnAbility(pkmn[hatchedPkmn].id)    
-        divTag = `<span>New!</span>`
+        divTag = `<span>${t("explore.areaEnd.new", "New!")}</span>`
     } 
 
 
     if (rng(shinyPkmnChance) && pkmn[hatchedPkmn].shiny!=true){ //shiny
         pkmn[hatchedPkmn].shiny = true
-        divTag = `<span>✦Shiny✦!</span>`
+        divTag = `<span>${t("explore.areaEnd.shiny", "✦Shiny✦!")}</span>`
+        isShinyTag = true
     }
+
 
     
 
@@ -877,7 +948,7 @@ function leaveCombat(){
     if (saved.hideGotPkmn == "true" && divTag=="") continue
 
     divPkmn.innerHTML = `<img class="sprite-trim" src="img/pkmn/sprite/${hatchedPkmn}.png">`+divTag;
-    if (divTag == `<span>✦Shiny✦!</span>`) divPkmn.innerHTML = `<img class="sprite-trim" src="img/pkmn/shiny/${hatchedPkmn}.png">`+divTag;
+    if (isShinyTag) divPkmn.innerHTML = `<img class="sprite-trim" src="img/pkmn/shiny/${hatchedPkmn}.png">`+divTag;
     document.getElementById("area-end-pkmn-list").appendChild(divPkmn);
 
     noPkmn = false
@@ -891,8 +962,10 @@ function leaveCombat(){
 
 
     let divTag = ""
+    let isShinyTag = false
 
     for (const iv in pkmn[i].ivs){
+
         const ivId = pkmn[i].ivs[iv]
         //let maxIv = 3
         let newIv = 0
@@ -908,7 +981,7 @@ function leaveCombat(){
 
         if (newIv>ivId) {
             pkmn[i].ivs[iv] = newIv
-             divTag = `<span>Iv's Up!</span>`
+             divTag = `<span>${t("explore.areaEnd.ivsUp", "IVs Up!")}</span>`
         }
     }
 
@@ -917,14 +990,16 @@ function leaveCombat(){
         pkmn[i].movepool.push(newMove)
         pkmn[i].moves.slot1 = newMove 
         pkmn[i].ability = learnPkmnAbility(pkmn[i].id)    
-        divTag = `<span>New!</span>`
+        divTag = `<span>${t("explore.areaEnd.new", "New!")}</span>`
     } 
 
 
     if (rng(shinyPkmnChanceEncounter)){ //shiny
         pkmn[i].shiny = true
-        divTag = `<span>✦Shiny✦!</span>`
+        divTag = `<span>${t("explore.areaEnd.shiny", "✦Shiny✦!")}</span>`
+        isShinyTag = true
     }
+
 
     
 
@@ -933,7 +1008,7 @@ function leaveCombat(){
 
 
     divPkmn.innerHTML = `<img class="sprite-trim" src="img/pkmn/sprite/${i}.png">`+divTag;
-    if (divTag == `<span>✦Shiny✦!</span>`) divPkmn.innerHTML = `<img class="sprite-trim" src="img/pkmn/shiny/${i}.png">`+divTag;
+    if (isShinyTag) divPkmn.innerHTML = `<img class="sprite-trim" src="img/pkmn/shiny/${i}.png">`+divTag;
     document.getElementById("area-end-pkmn-list").appendChild(divPkmn);
 
     pkmn[i].caught++
@@ -951,7 +1026,15 @@ function leaveCombat(){
         if (pkmn[i].newMoves.length == 0) continue
 
         const div = document.createElement("span");
-        div.innerHTML = `${format(i)} has learnt ${joinWithAnd(pkmn[i].newMoves)}!`
+        div.innerHTML = t(
+            "explore.areaEnd.learnedMoves",
+            "{pokemon} has learnt {moves}!",
+            {
+                pokemon: format(i),
+                moves: joinWithAnd(pkmn[i].newMoves)
+            }
+        )
+
 
         document.getElementById("area-end-moves-title").appendChild(div);
         document.getElementById("area-end-moves-title").style.display = "flex"
@@ -963,7 +1046,12 @@ function leaveCombat(){
 
 
         const div = document.createElement("span");
-        div.innerHTML = `${format(i)} has been unlocked!`
+        div.innerHTML = t(
+            "explore.areaEnd.unlockedPokemon",
+            "{pokemon} has been unlocked!",
+            { pokemon: format(i) }
+        )
+
 
         document.getElementById("area-end-moves-title").appendChild(div);
         document.getElementById("area-end-moves-title").style.display = "flex"
@@ -981,8 +1069,18 @@ function leaveCombat(){
     if (noItems) document.getElementById("area-end-item-title").style.display = "none"
     if (noItems) document.getElementById("area-end-item-list").style.display = "none"
     if (noItems && noPkmn) {
-        document.getElementById("area-end-item-title").innerHTML = "No new items or Pokemon :("
-        if (saved.currentArea == areas.training.id) document.getElementById("area-end-item-title").innerHTML = `<div style="display:flex; flex-direction:column; width: 100%; height:auto; justify-content:center; align-items:center; flex-shrink:0; text-align:center">Training Failed :(<br><br>Try to improve your Pokemon further:<br> <div class="genetics-overview-tags" > <div style="filter:hue-rotate(0deg)">Get better type-matching moves</div> <div style="filter:hue-rotate(0deg)">Get better moves that correctly match your stat distribution (Physical/Special)</div> <div style="filter:hue-rotate(0deg)">Use Stat Up moves that match your moves</div> <div style="filter:hue-rotate(0deg)">Unlock a Hidden Ability</div> <div style="filter:hue-rotate(0deg)">Get a better Ability</div> <div style="filter:hue-rotate(0deg)">Modify stats with Genetics</div> </div></div>`
+        document.getElementById("area-end-item-title").innerHTML = t(
+            "explore.areaEnd.noRewards",
+            "No new items or Pokemon :("
+        )
+
+        if (saved.currentArea == areas.training.id) {
+            document.getElementById("area-end-item-title").innerHTML = t(
+                "explore.training.failedHtml",
+                `<div style="display:flex; flex-direction:column; width: 100%; height:auto; justify-content:center; align-items:center; flex-shrink:0; text-align:center">Training Failed :(<br><br>Try to improve your Pokemon further:<br> <div class="genetics-overview-tags" > <div style="filter:hue-rotate(0deg)">Get better type-matching moves</div> <div style="filter:hue-rotate(0deg)">Get better moves that correctly match your stat distribution (Physical/Special)</div> <div style="filter:hue-rotate(0deg)">Use Stat Up moves that match your moves</div> <div style="filter:hue-rotate(0deg)">Unlock a Hidden Ability</div> <div style="filter:hue-rotate(0deg)">Get a better Ability</div> <div style="filter:hue-rotate(0deg)">Modify stats with Genetics</div> </div></div>`
+            )
+        }
+
         document.getElementById("area-end-item-title").style.display = "flex"
     }
 
@@ -991,11 +1089,24 @@ function leaveCombat(){
 
 
     document.getElementById("area-refight").style.display = "none"
+    const autoRefightTicketIcon = '<img src="img/items/autoRefightTicket.png">'
+    const autoRefightRequiresTicket = t(
+        "explore.autoRefight.requiresTicket",
+        "Auto-Refight <span>(Requires an {ticket} Auto-Refight Ticket)</span>",
+        { ticket: autoRefightTicketIcon }
+    )
+    const autoRefightNoTicket = t(
+        "explore.autoRefight.noTicket",
+        "Auto-Refight <span>(Won't use {ticket} Auto-Refight Tickets)</span>",
+        { ticket: autoRefightTicketIcon }
+    )
     if ( item.autoRefightTicket.got>0 && areas[saved.currentArea].type!="vs" && areas[saved.currentArea].type!="frontier" && areas[saved.currentArea].id != "training" && areas[saved.currentArea].encounter != true ) {
+
         document.getElementById("area-refight").style.display = "flex"
         document.getElementById("area-refight").innerHTML = `
         <svg style="margin-right:0.3rem" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 14 14"><path fill="currentColor" fill-rule="evenodd" d="M10.797 2.482a.61.61 0 0 1 0 .866L9.44 4.705h.924c1.393 0 2.305.572 2.845 1.343c.515.736.651 1.593.651 2.153c0 .561-.136 1.418-.651 2.154c-.54.77-1.452 1.342-2.845 1.342c-.948 0-1.695-.48-2.295-1.08c-.584-.584-1.093-1.347-1.56-2.046l-.019-.03c-.49-.734-.936-1.4-1.425-1.889c-.481-.48-.935-.721-1.429-.721c-1.01 0-1.54.39-1.84.82c-.327.466-.43 1.05-.43 1.45s.103.985.43 1.451c.3.43.83.82 1.84.82c.512 0 .982-.259 1.482-.775a.613.613 0 0 1 .88.852c-.612.632-1.379 1.148-2.362 1.148c-1.393 0-2.305-.571-2.845-1.342C.276 9.619.14 8.762.14 8.2s.137-1.418.651-2.153c.54-.77 1.452-1.343 2.845-1.343c.948 0 1.695.48 2.295 1.08c.584.585 1.093 1.348 1.56 2.047l.019.03c.49.734.936 1.4 1.425 1.889c.481.48.935.721 1.429.721c1.01 0 1.54-.39 1.84-.82c.327-.466.43-1.05.43-1.45s-.103-.986-.43-1.451c-.3-.43-.83-.82-1.84-.82H7.961a.613.613 0 0 1-.433-1.046L9.93 2.482a.61.61 0 0 1 .866 0" clip-rule="evenodd"/></svg>
-        Auto-Refight <span> (Requires an <img src="img/items/autoRefightTicket.png"> Auto-Refight Ticket)</span>
+        ${autoRefightRequiresTicket}
+
         `
         
     }
@@ -1003,7 +1114,8 @@ function leaveCombat(){
         document.getElementById("area-refight").style.display = "flex"
         document.getElementById("area-refight").innerHTML = `
         <svg style="margin-right:0.3rem" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 14 14"><path fill="currentColor" fill-rule="evenodd" d="M10.797 2.482a.61.61 0 0 1 0 .866L9.44 4.705h.924c1.393 0 2.305.572 2.845 1.343c.515.736.651 1.593.651 2.153c0 .561-.136 1.418-.651 2.154c-.54.77-1.452 1.342-2.845 1.342c-.948 0-1.695-.48-2.295-1.08c-.584-.584-1.093-1.347-1.56-2.046l-.019-.03c-.49-.734-.936-1.4-1.425-1.889c-.481-.48-.935-.721-1.429-.721c-1.01 0-1.54.39-1.84.82c-.327.466-.43 1.05-.43 1.45s.103.985.43 1.451c.3.43.83.82 1.84.82c.512 0 .982-.259 1.482-.775a.613.613 0 0 1 .88.852c-.612.632-1.379 1.148-2.362 1.148c-1.393 0-2.305-.571-2.845-1.342C.276 9.619.14 8.762.14 8.2s.137-1.418.651-2.153c.54-.77 1.452-1.343 2.845-1.343c.948 0 1.695.48 2.295 1.08c.584.585 1.093 1.348 1.56 2.047l.019.03c.49.734.936 1.4 1.425 1.889c.481.48.935.721 1.429.721c1.01 0 1.54-.39 1.84-.82c.327-.466.43-1.05.43-1.45s-.103-.986-.43-1.451c-.3-.43-.83-.82-1.84-.82H7.961a.613.613 0 0 1-.433-1.046L9.93 2.482a.61.61 0 0 1 .866 0" clip-rule="evenodd"/></svg>
-        Auto-Refight <span> (Wont use <img src="img/items/autoRefightTicket.png"> Auto-Refight Tickets)</span>
+        ${autoRefightNoTicket}
+
         `
     } 
 
@@ -1231,15 +1343,29 @@ for (let i = activeBars; i < hpBars.length; i++) {
 
     if (saved.currentArea == areas.training.id) {
     currentTrainingWave--
-    document.getElementById(`training-indicator-counter`).textContent = `Remaining: ${currentTrainingWave}`
+    document.getElementById(`training-indicator-counter`).textContent = t(
+        "explore.training.remaining",
+        "Remaining: {count}",
+        { count: currentTrainingWave }
+    )
+
     }
 
 
     if (saved.currentArea == areas.frontierSpiralingTower.id) {
     saved.currentSpiralFloor++
     saved.maxSpiralFloor = Math.max(saved.maxSpiralFloor,saved.currentSpiralFloor)
-    document.getElementById(`spiraling-current-floor`).textContent = `Floor: ${saved.currentSpiralFloor}`
-    document.getElementById(`spiraling-highest-floor`).textContent = `Highest Floor: ${saved.maxSpiralFloor}`
+    document.getElementById(`spiraling-current-floor`).textContent = t(
+        "explore.spiral.floor",
+        "Floor: {floor}",
+        { floor: saved.currentSpiralFloor }
+    )
+    document.getElementById(`spiraling-highest-floor`).textContent = t(
+        "explore.spiral.highestFloor",
+        "Highest Floor: {floor}",
+        { floor: saved.maxSpiralFloor }
+    )
+
     }
 
     //abilities
@@ -1390,7 +1516,8 @@ function openMenu(){
     if (saved.firstTimePlaying){
         if (pkmn.litten.caught==0 && pkmn.turtwig.caught==0 && pkmn.froakie.caught==0){
         navigator.brave?.isBrave?.().then(esBrave => {
-        if (esBrave) alert("Disable brave shield to properly run the page!");
+        if (esBrave) alert(t("explore.alert.disableBraveShield", "Disable brave shield to properly run the page!"));
+
         });
         }
 
@@ -1543,7 +1670,12 @@ for (const i in team) {
         
         pkmn[ team[i].pkmn.id ].exp -= 100
         pkmn[ team[i].pkmn.id ].level++
-        document.getElementById(`explore-${i}-lvl`).innerHTML = `lvl ${pkmn[ team[i].pkmn.id ].level}`
+        document.getElementById(`explore-${i}-lvl`).innerHTML = t(
+            "pkmn.level.short",
+            "lvl {level}",
+            { level: pkmn[ team[i].pkmn.id ].level }
+        )
+
         updateTeamExp()
 
 
@@ -1681,9 +1813,7 @@ document.addEventListener("dragstart", (e) => {
 document.addEventListener("selectstart", (e) => {
   e.preventDefault();
 });
-
 */
-
 
 
 function returnPkmnTypes(id){
@@ -3189,13 +3319,20 @@ function initialiseArea(){
 
 
     document.getElementById("auto-refight-info").style.display = "none"
+    const autoRefightTicketIcon = '<img src="img/items/autoRefightTicket.png">'
 
     if (saved.autoRefight==true){
+
     document.getElementById("auto-refight-info").style.display = "flex"
     document.getElementById("auto-refight-info").innerHTML = `
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3c4.97 0 9 4.03 9 9"><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></svg>
         
-           <div> Auto-Refight is active! <span>(x${item.autoRefightTicket.got} <img src="img/items/autoRefightTicket.png"> Auto-Refight Tickets remaining)</span> Click to disable it</div>
+           <div>${t(
+               "explore.autoRefight.activeWithTickets",
+               "Auto-Refight is active! <span>(x{count} {ticket} Auto-Refight Tickets remaining)</span> Click to disable it",
+               { count: item.autoRefightTicket.got, ticket: autoRefightTicketIcon }
+           )}</div>
+
     `
     }
 
@@ -3204,7 +3341,12 @@ function initialiseArea(){
     document.getElementById("auto-refight-info").innerHTML = `
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3c4.97 0 9 4.03 9 9"><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></svg>
         
-           <div> Auto-Refight is active! <span>(Wont consume an <img src="img/items/autoRefightTicket.png"> Auto-Refight Ticket)</span> Click to disable it</div>
+           <div>${t(
+               "explore.autoRefight.activeNoTickets",
+               "Auto-Refight is active! <span>(Won't consume an {ticket} Auto-Refight Ticket)</span> Click to disable it",
+               { ticket: autoRefightTicketIcon }
+           )}</div>
+
     `
     }
 
@@ -3247,13 +3389,13 @@ function setWildAreas() {
 
     document.getElementById("explore-selector").innerHTML = `
             <div style="background: #967546; outline: solid 1px #FF9E3D; color: white; z-index: 2;" onclick="setWildAreas()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="m17.861 3.163l.16.054l1.202.4c.463.155.87.29 1.191.44c.348.162.667.37.911.709s.341.707.385 1.088c.04.353.04.781.04 1.27v8.212c0 .698 0 1.287-.054 1.753c-.056.484-.182.962-.535 1.348a2.25 2.25 0 0 1-.746.538c-.478.212-.971.18-1.448.081c-.46-.096-1.018-.282-1.68-.503l-.043-.014c-1.12-.374-1.505-.49-1.877-.477a2.3 2.3 0 0 0-.441.059c-.363.085-.703.299-1.686.954l-1.382.922l-.14.093c-1.062.709-1.8 1.201-2.664 1.317c-.863.116-1.705-.165-2.915-.57l-.16-.053l-1.202-.4c-.463-.155-.87-.29-1.191-.44c-.348-.162-.667-.37-.911-.71c-.244-.338-.341-.706-.385-1.088c-.04-.353-.04-.78-.04-1.269V8.665c0-.699 0-1.288.054-1.753c.056-.484.182-.962.535-1.348a2.25 2.25 0 0 1 .746-.538c.478-.213.972-.181 1.448-.081c.46.095 1.018.282 1.68.503l.043.014c1.12.373 1.505.49 1.878.477a2.3 2.3 0 0 0 .44-.059c.363-.086.703-.3 1.686-.954l1.382-.922l.14-.094c1.062-.708 1.8-1.2 2.663-1.316c.864-.116 1.706.165 2.916.57m-2.111.943V16.58c.536.058 1.1.246 1.843.494l.125.042c.717.239 1.192.396 1.555.472c.356.074.477.04.532.016a.75.75 0 0 0 .249-.179c.04-.044.11-.149.152-.51c.043-.368.044-.869.044-1.624V7.163c0-.54-.001-.88-.03-1.138c-.028-.239-.072-.328-.112-.382c-.039-.054-.109-.125-.326-.226c-.236-.11-.56-.218-1.07-.389l-1.165-.388c-.887-.296-1.413-.464-1.797-.534m-1.5 12.654V4.434c-.311.18-.71.441-1.276.818l-1.382.922l-.11.073c-.688.46-1.201.802-1.732.994v12.326c.311-.18.71-.442 1.276-.819l1.382-.921l.11-.073c.688-.46 1.201-.802 1.732-.994m-6 3.135V7.42c-.536-.058-1.1-.246-1.843-.494l-.125-.042c-.717-.239-1.192-.396-1.556-.472c-.355-.074-.476-.041-.53-.017a.75.75 0 0 0-.25.18c-.04.043-.11.148-.152.509c-.043.368-.044.87-.044 1.625v8.128c0 .54.001.88.03 1.138c.028.239.072.327.112.382c.039.054.109.125.326.226c.236.11.56.218 1.07.389l1.165.388c.887.295 1.412.463 1.797.534" clip-rule="evenodd"/></svg>                Wild Areas</div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="m17.861 3.163l.16.054l1.202.4c.463.155.87.29 1.191.44c.348.162.667.37.911.709s.341.707.385 1.088c.04.353.04.781.04 1.27v8.212c0 .698 0 1.287-.054 1.753c-.056.484-.182.962-.535 1.348a2.25 2.25 0 0 1-.746.538c-.478.212-.971.18-1.448.081c-.46-.096-1.018-.282-1.68-.503l-.043-.014c-1.12-.374-1.505-.49-1.877-.477a2.3 2.3 0 0 0-.441.059c-.363.085-.703.299-1.686.954l-1.382.922l-.14.093c-1.062.709-1.8 1.201-2.664 1.317c-.863.116-1.705-.165-2.915-.57l-.16-.053l-1.202-.4c-.463-.155-.87-.29-1.191-.44c-.348-.162-.667-.37-.911-.71c-.244-.338-.341-.706-.385-1.088c-.04-.353-.04-.78-.04-1.269V8.665c0-.699 0-1.288.054-1.753c.056-.484.182-.962.535-1.348a2.25 2.25 0 0 1 .746-.538c.478-.213.972-.181 1.448-.081c.46.095 1.018.282 1.68.503l.043.014c1.12.373 1.505.49 1.878.477a2.3 2.3 0 0 0 .44-.059c.363-.086.703-.3 1.686-.954l1.382-.922l.14-.094c1.062-.708 1.8-1.2 2.663-1.316c.864-.116 1.706.165 2.916.57m-2.111.943V16.58c.536.058 1.1.246 1.843.494l.125.042c.717.239 1.192.396 1.555.472c.356.074.477.04.532.016a.75.75 0 0 0 .249-.179c.04-.044.11-.149.152-.51c.043-.368.044-.869.044-1.624V7.163c0-.54-.001-.88-.03-1.138c-.028-.239-.072-.328-.112-.382c-.039-.054-.109-.125-.326-.226c-.236-.11-.56-.218-1.07-.389l-1.165-.388c-.887-.296-1.413-.464-1.797-.534m-1.5 12.654V4.434c-.311.18-.71.441-1.276.818l-1.382.922l-.11.073c-.688.46-1.201.802-1.732.994v12.326c.311-.18.71-.442 1.276-.819l1.382-.921l.11-.073c.688-.46 1.201-.802 1.732-.994m-6 3.135V7.42c-.536-.058-1.1-.246-1.843-.494l-.125-.042c-.717-.239-1.192-.396-1.556-.472c-.355-.074-.476-.041-.53-.017a.75.75 0 0 0-.25.18c-.04.043-.11.148-.152.509c-.043.368-.044.87-.044 1.625v8.128c0 .54.001.88.03 1.138c.028.239.072.327.112.382c.039.054.109.125.326.226c.236.11.56.218 1.07.389l1.165.388c.887.295 1.412.463 1.797.534" clip-rule="evenodd"/></svg>                ${t("explore.selector.wildAreas", "Wild Areas")}</div>
             <div onclick="setDungeonAreas()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M4 10a8 8 0 1 1 16 0v8.667c0 1.246 0 1.869-.268 2.333a2 2 0 0 1-.732.732c-.464.268-1.087.268-2.333.268H7.333C6.087 22 5.464 22 5 21.732A2 2 0 0 1 4.268 21C4 20.536 4 19.913 4 18.667z"/><path d="M20 18H9c-.943 0-1.414 0-1.707.293S7 19.057 7 20v2m13-8h-7c-.943 0-1.414 0-1.707.293S11 15.057 11 16v2m9-8h-3c-.943 0-1.414 0-1.707.293S15 11.057 15 12v2"/></g></svg>
-                Dungeons</div>
+                ${t("explore.selector.dungeons", "Dungeons")}</div>
             <div onclick="setEventAreas()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m5.658 11.002l-1.47 3.308c-1.856 4.174-2.783 6.261-1.77 7.274s3.098.085 7.272-1.77L13 18.342c2.517-1.119 3.776-1.678 3.976-2.757s-.774-2.053-2.722-4l-1.838-1.839c-1.947-1.948-2.921-2.922-4-2.721c-1.079.2-1.638 1.459-2.757 3.976M6.5 10.5l7 7m-9-2l4 4M16 8l3-3m-4.803-3c.4.667.719 2.4-1.197 4m9 3.803c-.667-.4-2.4-.719-4 1.197m0-9v.02M22 6v.02M21 13v.02M11 3v.02"/></svg>
-                Events</div>
+                ${t("explore.selector.events", "Events")}</div>
     `
 
 
@@ -3262,14 +3404,14 @@ function setWildAreas() {
     document.getElementById("explore-menu-header").innerHTML = `
     <div style="display:flex; gap:0.2rem" >
     <span >
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="m17.861 3.163l.16.054l1.202.4c.463.155.87.29 1.191.44c.348.162.667.37.911.709s.341.707.385 1.088c.04.353.04.781.04 1.27v8.212c0 .698 0 1.287-.054 1.753c-.056.484-.182.962-.535 1.348a2.25 2.25 0 0 1-.746.538c-.478.212-.971.18-1.448.081c-.46-.096-1.018-.282-1.68-.503l-.043-.014c-1.12-.374-1.505-.49-1.877-.477a2.3 2.3 0 0 0-.441.059c-.363.085-.703.299-1.686.954l-1.382.922l-.14.093c-1.062.709-1.8 1.201-2.664 1.317c-.863.116-1.705-.165-2.915-.57l-.16-.053l-1.202-.4c-.463-.155-.87-.29-1.191-.44c-.348-.162-.667-.37-.911-.71c-.244-.338-.341-.706-.385-1.088c-.04-.353-.04-.78-.04-1.269V8.665c0-.699 0-1.288.054-1.753c.056-.484.182-.962.535-1.348a2.25 2.25 0 0 1 .746-.538c.478-.213.972-.181 1.448-.081c.46.095 1.018.282 1.68.503l.043.014c1.12.373 1.505.49 1.878.477a2.3 2.3 0 0 0 .44-.059c.363-.086.703-.3 1.686-.954l1.382-.922l.14-.094c1.062-.708 1.8-1.2 2.663-1.316c.864-.116 1.706.165 2.916.57m-2.111.943V16.58c.536.058 1.1.246 1.843.494l.125.042c.717.239 1.192.396 1.555.472c.356.074.477.04.532.016a.75.75 0 0 0 .249-.179c.04-.044.11-.149.152-.51c.043-.368.044-.869.044-1.624V7.163c0-.54-.001-.88-.03-1.138c-.028-.239-.072-.328-.112-.382c-.039-.054-.109-.125-.326-.226c-.236-.11-.56-.218-1.07-.389l-1.165-.388c-.887-.296-1.413-.464-1.797-.534m-1.5 12.654V4.434c-.311.18-.71.441-1.276.818l-1.382.922l-.11.073c-.688.46-1.201.802-1.732.994v12.326c.311-.18.71-.442 1.276-.819l1.382-.921l.11-.073c.688-.46 1.201-.802 1.732-.994m-6 3.135V7.42c-.536-.058-1.1-.246-1.843-.494l-.125-.042c-.717-.239-1.192-.396-1.556-.472c-.355-.074-.476-.041-.53-.017a.75.75 0 0 0-.25.18c-.04.043-.11.148-.152.509c-.043.368-.044.87-.044 1.625v8.128c0 .54.001.88.03 1.138c.028.239.072.327.112.382c.039.054.109.125.326.226c.236.11.56.218 1.07.389l1.165.388c.887.295 1.412.463 1.797.534" clip-rule="evenodd"/></svg>    Wild Areas
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="m17.861 3.163l.16.054l1.202.4c.463.155.87.29 1.191.44c.348.162.667.37.911.709s.341.707.385 1.088c.04.353.04.781.04 1.27v8.212c0 .698 0 1.287-.054 1.753c-.056.484-.182.962-.535 1.348a2.25 2.25 0 0 1-.746.538c-.478.212-.971.18-1.448.081c-.46-.096-1.018-.282-1.68-.503l-.043-.014c-1.12-.374-1.505-.49-1.877-.477a2.3 2.3 0 0 0-.441.059c-.363.085-.703.299-1.686.954l-1.382.922l-.14.093c-1.062.709-1.8 1.201-2.664 1.317c-.863.116-1.705-.165-2.915-.57l-.16-.053l-1.202-.4c-.463-.155-.87-.29-1.191-.44c-.348-.162-.667-.37-.911-.71c-.244-.338-.341-.706-.385-1.088c-.04-.353-.04-.78-.04-1.269V8.665c0-.699 0-1.288.054-1.753c.056-.484.182-.962.535-1.348a2.25 2.25 0 0 1 .746-.538c.478-.213.972-.181 1.448-.081c.46.095 1.018.282 1.68.503l.043.014c1.12.373 1.505.49 1.878.477a2.3 2.3 0 0 0 .44-.059c.363-.086.703-.3 1.686-.954l1.382-.922l.14-.094c1.062-.708 1.8-1.2 2.663-1.316c.864-.116 1.706.165 2.916.57m-2.111.943V16.58c.536.058 1.1.246 1.843.494l.125.042c.717.239 1.192.396 1.555.472c.356.074.477.04.532.016a.75.75 0 0 0 .249-.179c.04-.044.11-.149.152-.51c.043-.368.044-.869.044-1.624V7.163c0-.54-.001-.88-.03-1.138c-.028-.239-.072-.328-.112-.382c-.039-.054-.109-.125-.326-.226c-.236-.11-.56-.218-1.07-.389l-1.165-.388c-.887-.296-1.413-.464-1.797-.534m-1.5 12.654V4.434c-.311.18-.71.441-1.276.818l-1.382.922l-.11.073c-.688.46-1.201.802-1.732.994v12.326c.311-.18.71-.442 1.276-.819l1.382-.921l.11-.073c.688-.46 1.201-.802 1.732-.994m-6 3.135V7.42c-.536-.058-1.1-.246-1.843-.494l-.125-.042c-.717-.239-1.192-.396-1.556-.472c-.355-.074-.476-.041-.53-.017a.75.75 0 0 0-.25.18c-.04.043-.11.148-.152.509c-.043.368-.044.87-.044 1.625v8.128c0 .54.001.88.03 1.138c.028.239.072.327.112.382c.039.054.109.125.326.226c.236.11.56.218 1.07.389l1.165.388c.887.295 1.412.463 1.797.534" clip-rule="evenodd"/></svg>    ${t("explore.title.wildAreas", "Wild Areas")}
     </span>
     <span class="header-help" data-help="Wild Areas"><svg  style="opacity:0.8; pointer-events:none" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><g fill="currentColor"><g opacity="0.2"><path d="M12.739 17.213a2 2 0 1 1-4 0a2 2 0 0 1 4 0"/><path fill-rule="evenodd" d="M10.71 5.765c-.67 0-1.245.2-1.65.486c-.39.276-.583.597-.639.874a1.45 1.45 0 0 1-2.842-.574c.227-1.126.925-2.045 1.809-2.67c.92-.65 2.086-1.016 3.322-1.016c2.557 0 5.208 1.71 5.208 4.456c0 1.59-.945 2.876-2.169 3.626a1.45 1.45 0 1 1-1.514-2.474c.57-.349.783-.794.783-1.152c0-.574-.715-1.556-2.308-1.556" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10.71 9.63c.8 0 1.45.648 1.45 1.45v1.502a1.45 1.45 0 1 1-2.9 0V11.08c0-.8.649-1.45 1.45-1.45" clip-rule="evenodd"/><path fill-rule="evenodd" d="M14.239 8.966a1.45 1.45 0 0 1-.5 1.99l-2.284 1.367a1.45 1.45 0 0 1-1.49-2.488l2.285-1.368a1.45 1.45 0 0 1 1.989.5" clip-rule="evenodd"/></g><path d="M11 16.25a1.25 1.25 0 1 1-2.5 0a1.25 1.25 0 0 1 2.5 0"/><path fill-rule="evenodd" d="M9.71 4.065c-.807 0-1.524.24-2.053.614c-.51.36-.825.826-.922 1.308a.75.75 0 1 1-1.47-.297c.186-.922.762-1.696 1.526-2.236c.796-.562 1.82-.89 2.919-.89c2.325 0 4.508 1.535 4.508 3.757c0 1.292-.768 2.376-1.834 3.029a.75.75 0 0 1-.784-1.28c.729-.446 1.118-1.093 1.118-1.749c0-1.099-1.182-2.256-3.008-2.256m0 5.265a.75.75 0 0 1 .75.75v1.502a.75.75 0 1 1-1.5 0V10.08a.75.75 0 0 1 .75-.75" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12.638 8.326a.75.75 0 0 1-.258 1.029l-2.285 1.368a.75.75 0 1 1-.77-1.287l2.285-1.368a.75.75 0 0 1 1.028.258" clip-rule="evenodd"/></g></svg></span>
     </div>
 
     <div class="rotation-timer">
     <strong><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M6.94 2c.416 0 .753.324.753.724v1.46c.668-.012 1.417-.012 2.26-.012h4.015c.842 0 1.591 0 2.259.013v-1.46c0-.4.337-.725.753-.725s.753.324.753.724V4.25c1.445.111 2.394.384 3.09 1.055c.698.67.982 1.582 1.097 2.972L22 9H2v-.724c.116-1.39.4-2.302 1.097-2.972s1.645-.944 3.09-1.055V2.724c0-.4.337-.724.753-.724"/><path fill="currentColor" d="M22 14v-2c0-.839-.004-2.335-.017-3H2.01c-.013.665-.01 2.161-.01 3v2c0 3.771 0 5.657 1.172 6.828S6.228 22 10 22h4c3.77 0 5.656 0 6.828-1.172S22 17.772 22 14" opacity="0.5"/><path fill="currentColor" d="M18 17a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0"/></svg>
-    Rotation ${currentWildRotation}/${rotationWildMax}</strong>
+    ${t("explore.rotation", "Rotation {current}/{max}", { current: rotationWildCurrent, max: rotationWildMax })}</strong>
     <div class="time-counter-daily"></div>
     </div>
     `
@@ -3326,7 +3468,7 @@ function setWildAreas() {
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M25.719 4.781a2.9 2.9 0 0 0-1.125.344l-4.719 2.5L13.5 6.062l-.375-.093l-.375.187l-2.156 1.25l-1.281.75l1.187.906l2.719 2.063l-3.406 1.813l-3.657-1.657l-.437-.187l-.438.219l-1.75.937l-1.156.625l.875.938l5.406 5.812l.5.594l.688-.375L15 17.094l-1.031 5.687l-.344 1.813l1.719-.719l2.562-1.094l.375-.156l.157-.375l3.718-9.031l5.25-2.813c1.446-.777 2.028-2.617 1.25-4.062a3 3 0 0 0-1.781-1.438a3.1 3.1 0 0 0-1.156-.125m.187 2c.125-.008.254-.004.375.032a.979.979 0 0 1 .188 1.812l-5.594 3.031l-.313.156l-.125.344l-3.718 8.938l-.438.187l1.063-5.906l.375-2.031l-1.813.969l-6.312 3.406l-3.969-4.313l.156-.094l3.657 1.626l.468.218l.406-.25l15.22-8.031a.9.9 0 0 1 .374-.094M13.375 8.094l3.844.937l-2.063 1.063l-2.25-1.719zM3 26v2h26v-2z"/></svg>
                 </span>
                         <span style="font-size:1.2rem">${format(areas.wildlifePark.id)}</span>
-                        <span><strong style="background:#B18451">Level: ${Math.max(1,areas.wildlifePark.level-10)}-${areas.wildlifePark.level}</strong><span></span></span>
+                        <span><strong style="background:#B18451">${t("explore.levelRange", "Level: {min}-{max}", { min: Math.max(1, areas.wildlifePark.level - 10), max: areas.wildlifePark.level })}</strong><span></span></span>
                     </span>
                 </div>
                 <div style="width: 8rem;" class="explore-ticket-right">
@@ -3395,10 +3537,10 @@ function setWildAreas() {
 
 
         let unlockRequirement = ""
-        if (areas[i].unlockRequirement && !areas[i].unlockRequirement()) unlockRequirement =`<span class="ticket-unlock">
+       if (areas[i].unlockRequirement && !areas[i].unlockRequirement()) unlockRequirement =`<span class="ticket-unlock">
        
        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M2 16c0-2.828 0-4.243.879-5.121C3.757 10 5.172 10 8 10h8c2.828 0 4.243 0 5.121.879C22 11.757 22 13.172 22 16s0 4.243-.879 5.121C20.243 22 18.828 22 16 22H8c-2.828 0-4.243 0-5.121-.879C2 20.243 2 18.828 2 16" opacity="0.5"/><path fill="currentColor" d="M6.75 8a5.25 5.25 0 0 1 10.5 0v2.004c.567.005 1.064.018 1.5.05V8a6.75 6.75 0 0 0-13.5 0v2.055a24 24 0 0 1 1.5-.051z"/></svg>
-       <span>${areas[i].unlockDescription}</span>
+       <span>${getUnlockDescription(areas[i])}</span>
        </span>`
         ticketIndex++
 
@@ -3432,7 +3574,7 @@ function setWildAreas() {
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M25.719 4.781a2.9 2.9 0 0 0-1.125.344l-4.719 2.5L13.5 6.062l-.375-.093l-.375.187l-2.156 1.25l-1.281.75l1.187.906l2.719 2.063l-3.406 1.813l-3.657-1.657l-.437-.187l-.438.219l-1.75.937l-1.156.625l.875.938l5.406 5.812l.5.594l.688-.375L15 17.094l-1.031 5.687l-.344 1.813l1.719-.719l2.562-1.094l.375-.156l.157-.375l3.718-9.031l5.25-2.813c1.446-.777 2.028-2.617 1.25-4.062a3 3 0 0 0-1.781-1.438a3.1 3.1 0 0 0-1.156-.125m.187 2c.125-.008.254-.004.375.032a.979.979 0 0 1 .188 1.812l-5.594 3.031l-.313.156l-.125.344l-3.718 8.938l-.438.187l1.063-5.906l.375-2.031l-1.813.969l-6.312 3.406l-3.969-4.313l.156-.094l3.657 1.626l.468.218l.406-.25l15.22-8.031a.9.9 0 0 1 .374-.094M13.375 8.094l3.844.937l-2.063 1.063l-2.25-1.719zM3 26v2h26v-2z"/></svg>
                 </span>
                         <span style="font-size:1.2rem">${format(i)}</span>
-                        <span><strong style="background:#B18451">Level: ${Math.max(1,areas[i].level-10)}-${areas[i].level}</strong><span></span></span>
+                        <span><strong style="background:#B18451">${t("explore.levelRange", "Level: {min}-{max}", { min: Math.max(1, areas[i].level - 10), max: areas[i].level })}</strong><span></span></span>
                     </span>
                 </div>
                 <div style="width: 8rem;" class="explore-ticket-right">
@@ -3457,13 +3599,13 @@ function setDungeonAreas() {
 
     document.getElementById("explore-selector").innerHTML = `
             <div onclick="setWildAreas()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="m17.861 3.163l.16.054l1.202.4c.463.155.87.29 1.191.44c.348.162.667.37.911.709s.341.707.385 1.088c.04.353.04.781.04 1.27v8.212c0 .698 0 1.287-.054 1.753c-.056.484-.182.962-.535 1.348a2.25 2.25 0 0 1-.746.538c-.478.212-.971.18-1.448.081c-.46-.096-1.018-.282-1.68-.503l-.043-.014c-1.12-.374-1.505-.49-1.877-.477a2.3 2.3 0 0 0-.441.059c-.363.085-.703.299-1.686.954l-1.382.922l-.14.093c-1.062.709-1.8 1.201-2.664 1.317c-.863.116-1.705-.165-2.915-.57l-.16-.053l-1.202-.4c-.463-.155-.87-.29-1.191-.44c-.348-.162-.667-.37-.911-.71c-.244-.338-.341-.706-.385-1.088c-.04-.353-.04-.78-.04-1.269V8.665c0-.699 0-1.288.054-1.753c.056-.484.182-.962.535-1.348a2.25 2.25 0 0 1 .746-.538c.478-.213.972-.181 1.448-.081c.46.095 1.018.282 1.68.503l.043.014c1.12.373 1.505.49 1.878.477a2.3 2.3 0 0 0 .44-.059c.363-.086.703-.3 1.686-.954l1.382-.922l.14-.094c1.062-.708 1.8-1.2 2.663-1.316c.864-.116 1.706.165 2.916.57m-2.111.943V16.58c.536.058 1.1.246 1.843.494l.125.042c.717.239 1.192.396 1.555.472c.356.074.477.04.532.016a.75.75 0 0 0 .249-.179c.04-.044.11-.149.152-.51c.043-.368.044-.869.044-1.624V7.163c0-.54-.001-.88-.03-1.138c-.028-.239-.072-.328-.112-.382c-.039-.054-.109-.125-.326-.226c-.236-.11-.56-.218-1.07-.389l-1.165-.388c-.887-.296-1.413-.464-1.797-.534m-1.5 12.654V4.434c-.311.18-.71.441-1.276.818l-1.382.922l-.11.073c-.688.46-1.201.802-1.732.994v12.326c.311-.18.71-.442 1.276-.819l1.382-.921l.11-.073c.688-.46 1.201-.802 1.732-.994m-6 3.135V7.42c-.536-.058-1.1-.246-1.843-.494l-.125-.042c-.717-.239-1.192-.396-1.556-.472c-.355-.074-.476-.041-.53-.017a.75.75 0 0 0-.25.18c-.04.043-.11.148-.152.509c-.043.368-.044.87-.044 1.625v8.128c0 .54.001.88.03 1.138c.028.239.072.327.112.382c.039.054.109.125.326.226c.236.11.56.218 1.07.389l1.165.388c.887.295 1.412.463 1.797.534" clip-rule="evenodd"/></svg>                Wild Areas</div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="m17.861 3.163l.16.054l1.202.4c.463.155.87.29 1.191.44c.348.162.667.37.911.709s.341.707.385 1.088c.04.353.04.781.04 1.27v8.212c0 .698 0 1.287-.054 1.753c-.056.484-.182.962-.535 1.348a2.25 2.25 0 0 1-.746.538c-.478.212-.971.18-1.448.081c-.46-.096-1.018-.282-1.68-.503l-.043-.014c-1.12-.374-1.505-.49-1.877-.477a2.3 2.3 0 0 0-.441.059c-.363.085-.703.299-1.686.954l-1.382.922l-.14.093c-1.062.709-1.8 1.201-2.664 1.317c-.863.116-1.705-.165-2.915-.57l-.16-.053l-1.202-.4c-.463-.155-.87-.29-1.191-.44c-.348-.162-.667-.37-.911-.71c-.244-.338-.341-.706-.385-1.088c-.04-.353-.04-.78-.04-1.269V8.665c0-.699 0-1.288.054-1.753c.056-.484.182-.962.535-1.348a2.25 2.25 0 0 1 .746-.538c.478-.213.972-.181 1.448-.081c.46.095 1.018.282 1.68.503l.043.014c1.12.373 1.505.49 1.878.477a2.3 2.3 0 0 0 .44-.059c.363-.086.703-.3 1.686-.954l1.382-.922l.14-.094c1.062-.708 1.8-1.2 2.663-1.316c.864-.116 1.706.165 2.916.57m-2.111.943V16.58c.536.058 1.1.246 1.843.494l.125.042c.717.239 1.192.396 1.555.472c.356.074.477.04.532.016a.75.75 0 0 0 .249-.179c.04-.044.11-.149.152-.51c.043-.368.044-.869.044-1.624V7.163c0-.54-.001-.88-.03-1.138c-.028-.239-.072-.328-.112-.382c-.039-.054-.109-.125-.326-.226c-.236-.11-.56-.218-1.07-.389l-1.165-.388c-.887-.296-1.413-.464-1.797-.534m-1.5 12.654V4.434c-.311.18-.71.441-1.276.818l-1.382.922l-.11.073c-.688.46-1.201.802-1.732.994v12.326c.311-.18.71-.442 1.276-.819l1.382-.921l.11-.073c.688-.46 1.201-.802 1.732-.994m-6 3.135V7.42c-.536-.058-1.1-.246-1.843-.494l-.125-.042c-.717-.239-1.192-.396-1.556-.472c-.355-.074-.476-.041-.53-.017a.75.75 0 0 0-.25.18c-.04.043-.11.148-.152.509c-.043.368-.044.87-.044 1.625v8.128c0 .54.001.88.03 1.138c.028.239.072.327.112.382c.039.054.109.125.326.226c.236.11.56.218 1.07.389l1.165.388c.887.295 1.412.463 1.797.534" clip-rule="evenodd"/></svg>                ${t("explore.selector.wildAreas", "Wild Areas")}</div>
             <div style="background: #58644bff; outline: solid 1px #82df60ff; color: white; z-index: 2;" onclick="setDungeonAreas()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M4 10a8 8 0 1 1 16 0v8.667c0 1.246 0 1.869-.268 2.333a2 2 0 0 1-.732.732c-.464.268-1.087.268-2.333.268H7.333C6.087 22 5.464 22 5 21.732A2 2 0 0 1 4.268 21C4 20.536 4 19.913 4 18.667z"/><path d="M20 18H9c-.943 0-1.414 0-1.707.293S7 19.057 7 20v2m13-8h-7c-.943 0-1.414 0-1.707.293S11 15.057 11 16v2m9-8h-3c-.943 0-1.414 0-1.707.293S15 11.057 15 12v2"/></g></svg>
-                Dungeons</div>
+                ${t("explore.selector.dungeons", "Dungeons")}</div>
             <div onclick="setEventAreas()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m5.658 11.002l-1.47 3.308c-1.856 4.174-2.783 6.261-1.77 7.274s3.098.085 7.272-1.77L13 18.342c2.517-1.119 3.776-1.678 3.976-2.757s-.774-2.053-2.722-4l-1.838-1.839c-1.947-1.948-2.921-2.922-4-2.721c-1.079.2-1.638 1.459-2.757 3.976M6.5 10.5l7 7m-9-2l4 4M16 8l3-3m-4.803-3c.4.667.719 2.4-1.197 4m9 3.803c-.667-.4-2.4-.719-4 1.197m0-9v.02M22 6v.02M21 13v.02M11 3v.02"/></svg>
-                Events</div>
+                ${t("explore.selector.events", "Events")}</div>
     `
 
     document.getElementById("explore-listing").innerHTML = ""
@@ -3471,14 +3613,14 @@ function setDungeonAreas() {
     <div style="display:flex; gap:0.2rem" >
     <span >
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M4 10a8 8 0 1 1 16 0v8.667c0 1.246 0 1.869-.268 2.333a2 2 0 0 1-.732.732c-.464.268-1.087.268-2.333.268H7.333C6.087 22 5.464 22 5 21.732A2 2 0 0 1 4.268 21C4 20.536 4 19.913 4 18.667z"/><path d="M20 18H9c-.943 0-1.414 0-1.707.293S7 19.057 7 20v2m13-8h-7c-.943 0-1.414 0-1.707.293S11 15.057 11 16v2m9-8h-3c-.943 0-1.414 0-1.707.293S15 11.057 15 12v2"/></g></svg>
-    Dungeons
+    ${t("explore.title.dungeons", "Dungeons")}
     </span>
     <span class="header-help" data-help="Dungeons"><svg  style="opacity:0.8; pointer-events:none" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><g fill="currentColor"><g opacity="0.2"><path d="M12.739 17.213a2 2 0 1 1-4 0a2 2 0 0 1 4 0"/><path fill-rule="evenodd" d="M10.71 5.765c-.67 0-1.245.2-1.65.486c-.39.276-.583.597-.639.874a1.45 1.45 0 0 1-2.842-.574c.227-1.126.925-2.045 1.809-2.67c.92-.65 2.086-1.016 3.322-1.016c2.557 0 5.208 1.71 5.208 4.456c0 1.59-.945 2.876-2.169 3.626a1.45 1.45 0 1 1-1.514-2.474c.57-.349.783-.794.783-1.152c0-.574-.715-1.556-2.308-1.556" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10.71 9.63c.8 0 1.45.648 1.45 1.45v1.502a1.45 1.45 0 1 1-2.9 0V11.08c0-.8.649-1.45 1.45-1.45" clip-rule="evenodd"/><path fill-rule="evenodd" d="M14.239 8.966a1.45 1.45 0 0 1-.5 1.99l-2.284 1.367a1.45 1.45 0 0 1-1.49-2.488l2.285-1.368a1.45 1.45 0 0 1 1.989.5" clip-rule="evenodd"/></g><path d="M11 16.25a1.25 1.25 0 1 1-2.5 0a1.25 1.25 0 0 1 2.5 0"/><path fill-rule="evenodd" d="M9.71 4.065c-.807 0-1.524.24-2.053.614c-.51.36-.825.826-.922 1.308a.75.75 0 1 1-1.47-.297c.186-.922.762-1.696 1.526-2.236c.796-.562 1.82-.89 2.919-.89c2.325 0 4.508 1.535 4.508 3.757c0 1.292-.768 2.376-1.834 3.029a.75.75 0 0 1-.784-1.28c.729-.446 1.118-1.093 1.118-1.749c0-1.099-1.182-2.256-3.008-2.256m0 5.265a.75.75 0 0 1 .75.75v1.502a.75.75 0 1 1-1.5 0V10.08a.75.75 0 0 1 .75-.75" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12.638 8.326a.75.75 0 0 1-.258 1.029l-2.285 1.368a.75.75 0 1 1-.77-1.287l2.285-1.368a.75.75 0 0 1 1.028.258" clip-rule="evenodd"/></g></svg></span>
     </div>
 
     <div class="rotation-timer">
     <strong><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M6.94 2c.416 0 .753.324.753.724v1.46c.668-.012 1.417-.012 2.26-.012h4.015c.842 0 1.591 0 2.259.013v-1.46c0-.4.337-.725.753-.725s.753.324.753.724V4.25c1.445.111 2.394.384 3.09 1.055c.698.67.982 1.582 1.097 2.972L22 9H2v-.724c.116-1.39.4-2.302 1.097-2.972s1.645-.944 3.09-1.055V2.724c0-.4.337-.724.753-.724"/><path fill="currentColor" d="M22 14v-2c0-.839-.004-2.335-.017-3H2.01c-.013.665-.01 2.161-.01 3v2c0 3.771 0 5.657 1.172 6.828S6.228 22 10 22h4c3.77 0 5.656 0 6.828-1.172S22 17.772 22 14" opacity="0.5"/><path fill="currentColor" d="M18 17a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0"/></svg>
-    Rotation ${rotationDungeonCurrent}/${rotationDungeonMax}</strong>
+    ${t("explore.rotation", "Rotation {current}/{max}", { current: rotationDungeonCurrent, max: rotationDungeonMax })}</strong>
     <div class="time-counter-daily"></div>
     </div>
 
@@ -3513,10 +3655,10 @@ function setDungeonAreas() {
     }
 
         let unlockRequirement = ""
-        if (areas[i].unlockRequirement && !areas[i].unlockRequirement()) unlockRequirement =`<span class="ticket-unlock">
+       if (areas[i].unlockRequirement && !areas[i].unlockRequirement()) unlockRequirement =`<span class="ticket-unlock">
        
        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M2 16c0-2.828 0-4.243.879-5.121C3.757 10 5.172 10 8 10h8c2.828 0 4.243 0 5.121.879C22 11.757 22 13.172 22 16s0 4.243-.879 5.121C20.243 22 18.828 22 16 22H8c-2.828 0-4.243 0-5.121-.879C2 20.243 2 18.828 2 16" opacity="0.5"/><path fill="currentColor" d="M6.75 8a5.25 5.25 0 0 1 10.5 0v2.004c.567.005 1.064.018 1.5.05V8a6.75 6.75 0 0 0-13.5 0v2.055a24 24 0 0 1 1.5-.051z"/></svg>
-       <span>${areas[i].unlockDescription}</span>
+       <span>${getUnlockDescription(areas[i])}</span>
        </span>`
         ticketIndex++
 
@@ -3541,7 +3683,7 @@ function setDungeonAreas() {
                 </span>
 
                         <span style="font-size:1.2rem">${format(i)}</span>
-                        <span><strong style="background:#6BBC77">Level: ${Math.max(1,areas[i].level-10)}-${areas[i].level}</strong><span></span></span>
+                        <span><strong style="background:#6BBC77">${t("explore.levelRange", "Level: {min}-{max}", { min: Math.max(1, areas[i].level - 10), max: areas[i].level })}</strong><span></span></span>
                     </span>
                 </div>
                 <div style="width: 8rem;" class="explore-ticket-right">
@@ -3568,7 +3710,11 @@ function setEventAreas() {
         document.getElementById("tooltipTop").style.display = `none`
         document.getElementById("tooltipTitle").style.display = `none`
         document.getElementById("tooltipBottom").style.display = `none`
-        document.getElementById("tooltipMid").innerHTML = `Complete the tutorial to access events`
+        document.getElementById("tooltipMid").innerHTML = t(
+            "tutorial.eventsLocked",
+            "Complete the tutorial to access events"
+        )
+
         openTooltip()
         return
     }
@@ -3580,7 +3726,7 @@ function setEventAreas() {
         document.getElementById("tooltipTop").style.display = `none`
         document.getElementById("tooltipTitle").style.display = `none`
         document.getElementById("tooltipBottom").style.display = `none`
-        document.getElementById("tooltipMid").innerHTML = `Defeat Team Leader Giovanni in VS mode to unlock`
+        document.getElementById("tooltipMid").innerHTML = t("explore.event.lockGiovanni", "Defeat Team Leader Giovanni in VS mode to unlock")
         openTooltip()
         return
     }
@@ -3590,7 +3736,7 @@ function setEventAreas() {
         document.getElementById("tooltipTop").style.display = `none`
         document.getElementById("tooltipTitle").style.display = `none`
         document.getElementById("tooltipBottom").style.display = `none`
-        document.getElementById("tooltipMid").innerHTML = `Not yet implemented`
+        document.getElementById("tooltipMid").innerHTML = t("explore.event.notImplemented", "Not yet implemented")
         openTooltip()
         return
     }
@@ -3601,12 +3747,12 @@ function setEventAreas() {
     document.getElementById("event-banner-category").style.display = "flex"
     let eventTitle = ""
 
-    if (rotationEventCurrent==1) eventTitle = `Return To Kanto`
-    if (rotationEventCurrent==2) eventTitle = `Primeval Wilds`
-    if (rotationEventCurrent==3) eventTitle = `Ancients Awoken`
-    if (rotationEventCurrent==4) eventTitle = `Aether Takeover`
-    if (rotationEventCurrent==5) eventTitle = `Science Future`
-    if (rotationEventCurrent==6) eventTitle = `Sinnoh Expedition`
+    if (rotationEventCurrent==1) eventTitle = t("explore.eventTitle.returnToKanto", "Return To Kanto")
+    if (rotationEventCurrent==2) eventTitle = t("explore.eventTitle.primevalWilds", "Primeval Wilds")
+    if (rotationEventCurrent==3) eventTitle = t("explore.eventTitle.ancientsAwoken", "Ancients Awoken")
+    if (rotationEventCurrent==4) eventTitle = t("explore.eventTitle.aetherTakeover", "Aether Takeover")
+    if (rotationEventCurrent==5) eventTitle = t("explore.eventTitle.scienceFuture", "Science Future")
+    if (rotationEventCurrent==6) eventTitle = t("explore.eventTitle.sinnohExpedition", "Sinnoh Expedition")
 
     if (rotationEventCurrent==1) document.getElementById("event-banner").style.backgroundImage = "url(img/bg/event/kanto.png)"
     if (rotationEventCurrent==2) document.getElementById("event-banner").style.backgroundImage = "url(img/bg/event/past.png)"
@@ -3627,13 +3773,13 @@ function setEventAreas() {
 
     document.getElementById("explore-selector").innerHTML = `
             <div onclick="setWildAreas()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="m17.861 3.163l.16.054l1.202.4c.463.155.87.29 1.191.44c.348.162.667.37.911.709s.341.707.385 1.088c.04.353.04.781.04 1.27v8.212c0 .698 0 1.287-.054 1.753c-.056.484-.182.962-.535 1.348a2.25 2.25 0 0 1-.746.538c-.478.212-.971.18-1.448.081c-.46-.096-1.018-.282-1.68-.503l-.043-.014c-1.12-.374-1.505-.49-1.877-.477a2.3 2.3 0 0 0-.441.059c-.363.085-.703.299-1.686.954l-1.382.922l-.14.093c-1.062.709-1.8 1.201-2.664 1.317c-.863.116-1.705-.165-2.915-.57l-.16-.053l-1.202-.4c-.463-.155-.87-.29-1.191-.44c-.348-.162-.667-.37-.911-.71c-.244-.338-.341-.706-.385-1.088c-.04-.353-.04-.78-.04-1.269V8.665c0-.699 0-1.288.054-1.753c.056-.484.182-.962.535-1.348a2.25 2.25 0 0 1 .746-.538c.478-.213.972-.181 1.448-.081c.46.095 1.018.282 1.68.503l.043.014c1.12.373 1.505.49 1.878.477a2.3 2.3 0 0 0 .44-.059c.363-.086.703-.3 1.686-.954l1.382-.922l.14-.094c1.062-.708 1.8-1.2 2.663-1.316c.864-.116 1.706.165 2.916.57m-2.111.943V16.58c.536.058 1.1.246 1.843.494l.125.042c.717.239 1.192.396 1.555.472c.356.074.477.04.532.016a.75.75 0 0 0 .249-.179c.04-.044.11-.149.152-.51c.043-.368.044-.869.044-1.624V7.163c0-.54-.001-.88-.03-1.138c-.028-.239-.072-.328-.112-.382c-.039-.054-.109-.125-.326-.226c-.236-.11-.56-.218-1.07-.389l-1.165-.388c-.887-.296-1.413-.464-1.797-.534m-1.5 12.654V4.434c-.311.18-.71.441-1.276.818l-1.382.922l-.11.073c-.688.46-1.201.802-1.732.994v12.326c.311-.18.71-.442 1.276-.819l1.382-.921l.11-.073c.688-.46 1.201-.802 1.732-.994m-6 3.135V7.42c-.536-.058-1.1-.246-1.843-.494l-.125-.042c-.717-.239-1.192-.396-1.556-.472c-.355-.074-.476-.041-.53-.017a.75.75 0 0 0-.25.18c-.04.043-.11.148-.152.509c-.043.368-.044.87-.044 1.625v8.128c0 .54.001.88.03 1.138c.028.239.072.327.112.382c.039.054.109.125.326.226c.236.11.56.218 1.07.389l1.165.388c.887.295 1.412.463 1.797.534" clip-rule="evenodd"/></svg>                Wild Areas</div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="m17.861 3.163l.16.054l1.202.4c.463.155.87.29 1.191.44c.348.162.667.37.911.709s.341.707.385 1.088c.04.353.04.781.04 1.27v8.212c0 .698 0 1.287-.054 1.753c-.056.484-.182.962-.535 1.348a2.25 2.25 0 0 1-.746.538c-.478.212-.971.18-1.448.081c-.46-.096-1.018-.282-1.68-.503l-.043-.014c-1.12-.374-1.505-.49-1.877-.477a2.3 2.3 0 0 0-.441.059c-.363.085-.703.299-1.686.954l-1.382.922l-.14.093c-1.062.709-1.8 1.201-2.664 1.317c-.863.116-1.705-.165-2.915-.57l-.16-.053l-1.202-.4c-.463-.155-.87-.29-1.191-.44c-.348-.162-.667-.37-.911-.71c-.244-.338-.341-.706-.385-1.088c-.04-.353-.04-.78-.04-1.269V8.665c0-.699 0-1.288.054-1.753c.056-.484.182-.962.535-1.348a2.25 2.25 0 0 1 .746-.538c.478-.213.972-.181 1.448-.081c.46.095 1.018.282 1.68.503l.043.014c1.12.373 1.505.49 1.878.477a2.3 2.3 0 0 0 .44-.059c.363-.086.703-.3 1.686-.954l1.382-.922l.14-.094c1.062-.708 1.8-1.2 2.663-1.316c.864-.116 1.706.165 2.916.57m-2.111.943V16.58c.536.058 1.1.246 1.843.494l.125.042c.717.239 1.192.396 1.555.472c.356.074.477.04.532.016a.75.75 0 0 0 .249-.179c.04-.044.11-.149.152-.51c.043-.368.044-.869.044-1.624V7.163c0-.54-.001-.88-.03-1.138c-.028-.239-.072-.328-.112-.382c-.039-.054-.109-.125-.326-.226c-.236-.11-.56-.218-1.07-.389l-1.165-.388c-.887-.296-1.413-.464-1.797-.534m-1.5 12.654V4.434c-.311.18-.71.441-1.276.818l-1.382.922l-.11.073c-.688.46-1.201.802-1.732.994v12.326c.311-.18.71-.442 1.276-.819l1.382-.921l.11-.073c.688-.46 1.201-.802 1.732-.994m-6 3.135V7.42c-.536-.058-1.1-.246-1.843-.494l-.125-.042c-.717-.239-1.192-.396-1.556-.472c-.355-.074-.476-.041-.53-.017a.75.75 0 0 0-.25.18c-.04.043-.11.148-.152.509c-.043.368-.044.87-.044 1.625v8.128c0 .54.001.88.03 1.138c.028.239.072.327.112.382c.039.054.109.125.326.226c.236.11.56.218 1.07.389l1.165.388c.887.295 1.412.463 1.797.534" clip-rule="evenodd"/></svg>                ${t("explore.selector.wildAreas", "Wild Areas")}</div>
             <div  onclick="setDungeonAreas()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M4 10a8 8 0 1 1 16 0v8.667c0 1.246 0 1.869-.268 2.333a2 2 0 0 1-.732.732c-.464.268-1.087.268-2.333.268H7.333C6.087 22 5.464 22 5 21.732A2 2 0 0 1 4.268 21C4 20.536 4 19.913 4 18.667z"/><path d="M20 18H9c-.943 0-1.414 0-1.707.293S7 19.057 7 20v2m13-8h-7c-.943 0-1.414 0-1.707.293S11 15.057 11 16v2m9-8h-3c-.943 0-1.414 0-1.707.293S15 11.057 15 12v2"/></g></svg>
-                Dungeons</div>
+                ${t("explore.selector.dungeons", "Dungeons")}</div>
             <div style="background: #91718B; outline: solid 1px #F97DFF; color: white; z-index: 2;" onclick="setEventAreas()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m5.658 11.002l-1.47 3.308c-1.856 4.174-2.783 6.261-1.77 7.274s3.098.085 7.272-1.77L13 18.342c2.517-1.119 3.776-1.678 3.976-2.757s-.774-2.053-2.722-4l-1.838-1.839c-1.947-1.948-2.921-2.922-4-2.721c-1.079.2-1.638 1.459-2.757 3.976M6.5 10.5l7 7m-9-2l4 4M16 8l3-3m-4.803-3c.4.667.719 2.4-1.197 4m9 3.803c-.667-.4-2.4-.719-4 1.197m0-9v.02M22 6v.02M21 13v.02M11 3v.02"/></svg>
-                Events</div>
+                ${t("explore.selector.events", "Events")}</div>
     `
 
 
@@ -3645,14 +3791,14 @@ function setEventAreas() {
     <div style="display:flex; gap:0.2rem" >
     <span >
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m5.658 11.002l-1.47 3.308c-1.856 4.174-2.783 6.261-1.77 7.274s3.098.085 7.272-1.77L13 18.342c2.517-1.119 3.776-1.678 3.976-2.757s-.774-2.053-2.722-4l-1.838-1.839c-1.947-1.948-2.921-2.922-4-2.721c-1.079.2-1.638 1.459-2.757 3.976M6.5 10.5l7 7m-9-2l4 4M16 8l3-3m-4.803-3c.4.667.719 2.4-1.197 4m9 3.803c-.667-.4-2.4-.719-4 1.197m0-9v.02M22 6v.02M21 13v.02M11 3v.02"/></svg>
-    Events
+    ${t("explore.title.events", "Events")}
     </span>
     <span class="header-help" data-help="Events"><svg  style="opacity:0.8; pointer-events:none" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><g fill="currentColor"><g opacity="0.2"><path d="M12.739 17.213a2 2 0 1 1-4 0a2 2 0 0 1 4 0"/><path fill-rule="evenodd" d="M10.71 5.765c-.67 0-1.245.2-1.65.486c-.39.276-.583.597-.639.874a1.45 1.45 0 0 1-2.842-.574c.227-1.126.925-2.045 1.809-2.67c.92-.65 2.086-1.016 3.322-1.016c2.557 0 5.208 1.71 5.208 4.456c0 1.59-.945 2.876-2.169 3.626a1.45 1.45 0 1 1-1.514-2.474c.57-.349.783-.794.783-1.152c0-.574-.715-1.556-2.308-1.556" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10.71 9.63c.8 0 1.45.648 1.45 1.45v1.502a1.45 1.45 0 1 1-2.9 0V11.08c0-.8.649-1.45 1.45-1.45" clip-rule="evenodd"/><path fill-rule="evenodd" d="M14.239 8.966a1.45 1.45 0 0 1-.5 1.99l-2.284 1.367a1.45 1.45 0 0 1-1.49-2.488l2.285-1.368a1.45 1.45 0 0 1 1.989.5" clip-rule="evenodd"/></g><path d="M11 16.25a1.25 1.25 0 1 1-2.5 0a1.25 1.25 0 0 1 2.5 0"/><path fill-rule="evenodd" d="M9.71 4.065c-.807 0-1.524.24-2.053.614c-.51.36-.825.826-.922 1.308a.75.75 0 1 1-1.47-.297c.186-.922.762-1.696 1.526-2.236c.796-.562 1.82-.89 2.919-.89c2.325 0 4.508 1.535 4.508 3.757c0 1.292-.768 2.376-1.834 3.029a.75.75 0 0 1-.784-1.28c.729-.446 1.118-1.093 1.118-1.749c0-1.099-1.182-2.256-3.008-2.256m0 5.265a.75.75 0 0 1 .75.75v1.502a.75.75 0 1 1-1.5 0V10.08a.75.75 0 0 1 .75-.75" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12.638 8.326a.75.75 0 0 1-.258 1.029l-2.285 1.368a.75.75 0 1 1-.77-1.287l2.285-1.368a.75.75 0 0 1 1.028.258" clip-rule="evenodd"/></g></svg></span>
     </div>
 
     <div class="rotation-timer">
     <strong><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M6.94 2c.416 0 .753.324.753.724v1.46c.668-.012 1.417-.012 2.26-.012h4.015c.842 0 1.591 0 2.259.013v-1.46c0-.4.337-.725.753-.725s.753.324.753.724V4.25c1.445.111 2.394.384 3.09 1.055c.698.67.982 1.582 1.097 2.972L22 9H2v-.724c.116-1.39.4-2.302 1.097-2.972s1.645-.944 3.09-1.055V2.724c0-.4.337-.724.753-.724"/><path fill="currentColor" d="M22 14v-2c0-.839-.004-2.335-.017-3H2.01c-.013.665-.01 2.161-.01 3v2c0 3.771 0 5.657 1.172 6.828S6.228 22 10 22h4c3.77 0 5.656 0 6.828-1.172S22 17.772 22 14" opacity="0.5"/><path fill="currentColor" d="M18 17a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0"/></svg>
-    Rotation ${rotationEventCurrent}/${rotationEventMax}</strong>
+    ${t("explore.rotation", "Rotation {current}/{max}", { current: rotationEventCurrent, max: rotationEventMax })}</strong>
     <div class="time-counter-event"></div>
     </div>
     `
@@ -3694,25 +3840,25 @@ function setEventAreas() {
        if (areas[i].unlockRequirement && !areas[i].unlockRequirement()) unlockRequirement =`<span class="ticket-unlock">
        
        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M2 16c0-2.828 0-4.243.879-5.121C3.757 10 5.172 10 8 10h8c2.828 0 4.243 0 5.121.879C22 11.757 22 13.172 22 16s0 4.243-.879 5.121C20.243 22 18.828 22 16 22H8c-2.828 0-4.243 0-5.121-.879C2 20.243 2 18.828 2 16" opacity="0.5"/><path fill="currentColor" d="M6.75 8a5.25 5.25 0 0 1 10.5 0v2.004c.567.005 1.064.018 1.5.05V8a6.75 6.75 0 0 0-13.5 0v2.055a24 24 0 0 1 1.5-.051z"/></svg>
-       <span>${areas[i].unlockDescription}</span>
+       <span>${getUnlockDescription(areas[i])}</span>
        </span>`
        if (areas[i].encounter && areas[i].difficulty===tier2difficulty && areas.vsEliteFourLance.defeated!=true) unlockRequirement =`<span class="ticket-unlock">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M2 16c0-2.828 0-4.243.879-5.121C3.757 10 5.172 10 8 10h8c2.828 0 4.243 0 5.121.879C22 11.757 22 13.172 22 16s0 4.243-.879 5.121C20.243 22 18.828 22 16 22H8c-2.828 0-4.243 0-5.121-.879C2 20.243 2 18.828 2 16" opacity="0.5"/><path fill="currentColor" d="M6.75 8a5.25 5.25 0 0 1 10.5 0v2.004c.567.005 1.064.018 1.5.05V8a6.75 6.75 0 0 0-13.5 0v2.055a24 24 0 0 1 1.5-.051z"/></svg>
-       Defeat Elite Four Lance in VS to unlock</span>`
+       ${t("explore.event.lockLance", "Defeat Elite Four Lance in VS to unlock")}</span>`
 
 
        let eventTag ;
-       eventTag = `<strong class="event-tag">Wild Zone ✦</strong>`
-       if (areas[i].uncatchable) eventTag = `<strong style="filter:hue-rotate(140deg)" class="event-tag">Collection ◈</strong>`
-       if (areas[i].encounter && areas[i].difficulty===tier1difficulty) eventTag = `<strong style="filter:hue-rotate(50deg)" class="event-tag">Tier I Raid ❖</strong>`
-       if (areas[i].encounter && areas[i].difficulty===tier2difficulty) eventTag = `<strong style="filter:hue-rotate(200deg)" class="event-tag">Tier II Raid ❖</strong>`
-       if (areas[i].encounter && areas[i].difficulty===tier3difficulty) eventTag = `<strong style="filter:hue-rotate(300deg)" class="event-tag">Tier III Raid ❖</strong>`
+       eventTag = `<strong class="event-tag">${t("explore.event.tag.wildZone", "Wild Zone ✦")}</strong>`
+       if (areas[i].uncatchable) eventTag = `<strong style="filter:hue-rotate(140deg)" class="event-tag">${t("explore.event.tag.collection", "Collection ◈")}</strong>`
+       if (areas[i].encounter && areas[i].difficulty===tier1difficulty) eventTag = `<strong style="filter:hue-rotate(50deg)" class="event-tag">${t("explore.event.tag.tier1Raid", "Tier I Raid ❖")}</strong>`
+       if (areas[i].encounter && areas[i].difficulty===tier2difficulty) eventTag = `<strong style="filter:hue-rotate(200deg)" class="event-tag">${t("explore.event.tag.tier2Raid", "Tier II Raid ❖")}</strong>`
+       if (areas[i].encounter && areas[i].difficulty===tier3difficulty) eventTag = `<strong style="filter:hue-rotate(300deg)" class="event-tag">${t("explore.event.tag.tier3Raid", "Tier III Raid ❖")}</strong>`
 
        let nameTag = ""
        if (areas[i].encounter) nameTag = `<svg class="event-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="m21.838 11.126l-.229 2.436c-.378 4.012-.567 6.019-1.75 7.228C18.678 22 16.906 22 13.36 22h-2.72c-3.545 0-5.317 0-6.5-1.21s-1.371-3.216-1.749-7.228l-.23-2.436c-.18-1.912-.27-2.869.058-3.264a1 1 0 0 1 .675-.367c.476-.042 1.073.638 2.268 1.998c.618.704.927 1.055 1.271 1.11a.92.92 0 0 0 .562-.09c.319-.16.53-.595.955-1.464l2.237-4.584C10.989 2.822 11.39 2 12 2s1.011.822 1.813 2.465l2.237 4.584c.424.87.636 1.304.955 1.464c.176.089.37.12.562.09c.344-.055.653-.406 1.271-1.11c1.195-1.36 1.792-2.04 2.268-1.998a1 1 0 0 1 .675.367c.327.395.237 1.352.057 3.264" opacity="0.5"/><path fill="currentColor" d="m12.952 12.699l-.098-.176c-.38-.682-.57-1.023-.854-1.023s-.474.34-.854 1.023l-.098.176c-.108.194-.162.29-.246.354c-.085.064-.19.088-.4.135l-.19.044c-.738.167-1.107.25-1.195.532s.164.577.667 1.165l.13.152c.143.167.215.25.247.354s.021.215 0 .438l-.02.203c-.076.785-.114 1.178.115 1.352c.23.174.576.015 1.267-.303l.178-.082c.197-.09.295-.136.399-.136s.202.046.399.136l.178.082c.691.319 1.037.477 1.267.303s.191-.567.115-1.352l-.02-.203c-.021-.223-.032-.334 0-.438s.104-.187.247-.354l.13-.152c.503-.588.755-.882.667-1.165c-.088-.282-.457-.365-1.195-.532l-.19-.044c-.21-.047-.315-.07-.4-.135c-.084-.064-.138-.16-.246-.354"/></svg>`
 
-       let eventName = format(i)
-       if (areas[i].name) eventName = areas[i].name
+       const eventName = getAreaName(i, areas[i])
+
 
 
         let levelrange = `${Math.max(1,areas[i].level-10)}-${areas[i].level}`
@@ -3747,7 +3893,7 @@ function setEventAreas() {
                 </span>
 
                         <span style="font-size:1.1rem">${eventName}${nameTag}</span>
-                        <span><strong style="background:#D57392">Level: ${levelrange}</strong>${eventTag}<span></span></span>
+                        <span><strong style="background:#D57392">${t("explore.level", "Level: {level}", { level: levelrange })}</strong>${eventTag}<span></span></span>
                     </span>
                 </div>
                 <div style="width: 8rem;" class="explore-ticket-right">
@@ -3924,6 +4070,45 @@ document.getElementById("pokedex-filter-evolution").addEventListener("change", e
   updatePokedex()
 });
 
+const normalizeSearchTerm = value => {
+    if (value === undefined || value === null) return "";
+    return String(value)
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+}
+
+const collectSearchTerms = value => {
+    const values = Array.isArray(value) ? value : [value];
+    return values
+        .filter(entry => entry !== undefined && entry !== null && entry !== "")
+        .map(entry => normalizeSearchTerm(entry))
+        .filter(entry => entry !== "");
+}
+
+const getLocalizedNames = (type, id) => {
+    if (!id) return [];
+    return [
+        id,
+        window.i18n?.tId?.(type, id),
+        format(id)
+    ].filter(Boolean);
+}
+
+const getTypeNames = types => {
+    if (!Array.isArray(types)) return [];
+    return types.flatMap(type => [
+        type,
+        window.i18n?.tId?.("type", type),
+        format(type)
+    ]);
+}
+
+const getMoveNames = movepool => {
+    if (!Array.isArray(movepool)) return [];
+    return movepool.flatMap(moveId => getLocalizedNames("move", moveId));
+}
+
 function resetPokedexFilters(){
     document.getElementById("pokedex-search").value = ""
     document.getElementById("pokedex-filter-tag").value = "all";
@@ -3970,6 +4155,13 @@ document.getElementById("pokedex-search").addEventListener("keydown", e => {
         includeTerms.push(term)
       }
     })
+
+    includeTerms = includeTerms
+        .map(term => term === '|' ? term : normalizeSearchTerm(term))
+        .filter(term => term !== "")
+    excludeTerms = excludeTerms
+        .map(term => normalizeSearchTerm(term))
+        .filter(term => term !== "")
     
     let results = []
     
@@ -4038,49 +4230,85 @@ function updatePokedex(){
         document.getElementById("pokedex-filters-title").style.display = "flex"
         document.getElementById("pokedex-filters-cancel").style.display = "flex"
         document.getElementById("pokedex-filters-remove").style.display = "flex"
-        document.getElementById("pokedex-filters-title").innerHTML = `Select a Pokemon to add to the team`
+        document.getElementById("pokedex-filters-title").innerHTML = t(
+            "team.selectPokemon",
+            "Select a Pokemon to add to the team"
+        )
+
     }
 
     if (tmToTeach != undefined) {
         document.getElementById("pokedex-filters-title").style.display = "flex"
         document.getElementById("pokedex-filters-cancel").style.display = "flex"
-        document.getElementById("pokedex-filters-title").innerHTML = `Select a Pokemon to teach ${format(tmToTeach)}`
+        document.getElementById("pokedex-filters-title").innerHTML = t(
+            "pokedex.selectTeachMove",
+            "Select a Pokemon to teach {move}",
+            { move: format(tmToTeach) }
+        )
+
     }
 
     if (evoItemToUse != undefined) {
         document.getElementById("pokedex-filters-title").style.display = "flex"
         document.getElementById("pokedex-filters-cancel").style.display = "flex"
-        document.getElementById("pokedex-filters-title").innerHTML = `Select a Pokemon to use the ${format(evoItemToUse)}`
+        document.getElementById("pokedex-filters-title").innerHTML = t(
+            "pokedex.selectUseItem",
+            "Select a Pokemon to use the {item}",
+            { item: format(evoItemToUse) }
+        )
+
     }
 
     if (vitaminToUse != undefined) {
         document.getElementById("pokedex-filters-title").style.display = "flex"
         document.getElementById("pokedex-filters-cancel").style.display = "flex"
-        document.getElementById("pokedex-filters-title").innerHTML = `Select a Pokemon to use the ${format(vitaminToUse)}`
+        document.getElementById("pokedex-filters-title").innerHTML = t(
+            "pokedex.selectUseItem",
+            "Select a Pokemon to use the {item}",
+            { item: format(vitaminToUse) }
+        )
+
     }
 
     if (itemToUse != undefined) {
         document.getElementById("pokedex-filters-title").style.display = "flex"
         document.getElementById("pokedex-filters-cancel").style.display = "flex"
-        document.getElementById("pokedex-filters-title").innerHTML = `Select a Pokemon to use the ${format(itemToUse)}`
+        document.getElementById("pokedex-filters-title").innerHTML = t(
+            "pokedex.selectUseItem",
+            "Select a Pokemon to use the {item}",
+            { item: format(itemToUse) }
+        )
+
     }
 
     if (dexHostSelect == true) {
         document.getElementById("pokedex-filters-title").style.display = "flex"
         document.getElementById("pokedex-filters-cancel").style.display = "flex"
-        document.getElementById("pokedex-filters-title").innerHTML = `Select a host Pokemon`
+        document.getElementById("pokedex-filters-title").innerHTML = t(
+            "pokedex.selectHost",
+            "Select a host Pokemon"
+        )
+
     }
 
     if (dexTrainSelect == true) {
         document.getElementById("pokedex-filters-title").style.display = "flex"
         document.getElementById("pokedex-filters-cancel").style.display = "flex"
-        document.getElementById("pokedex-filters-title").innerHTML = `Select a Pokemon to train`
+        document.getElementById("pokedex-filters-title").innerHTML = t(
+            "pokedex.selectTraining",
+            "Select a Pokemon to train"
+        )
+
     }
 
     if (dexSampleSelect == true) {
         document.getElementById("pokedex-filters-title").style.display = "flex"
         document.getElementById("pokedex-filters-cancel").style.display = "flex"
-        document.getElementById("pokedex-filters-title").innerHTML = `Select a sample Pokemon`
+        document.getElementById("pokedex-filters-title").innerHTML = t(
+            "pokedex.selectSample",
+            "Select a sample Pokemon"
+        )
+
     }
 
     let totalPokemon = 0
@@ -4170,9 +4398,19 @@ if (sort !== "default") {
 
 
 fusePkmn = new Fuse(sortedPokemon, {
-    keys: [ { name: 'name', getFn: obj => obj.id }, 'type', "level", `ability`, `hiddenAbility.id`, `movepool`,'tagShiny','tagPokerus'],
+    keys: [
+        { name: 'name', getFn: obj => collectSearchTerms(getLocalizedNames("pkmn", obj.id)) },
+        { name: 'type', getFn: obj => collectSearchTerms(getTypeNames(obj.type)) },
+        { name: 'level', getFn: obj => collectSearchTerms(obj.level) },
+        { name: 'ability', getFn: obj => collectSearchTerms(getLocalizedNames("ability", obj.ability)) },
+        { name: 'hiddenAbility', getFn: obj => collectSearchTerms(getLocalizedNames("ability", obj.hiddenAbility?.id)) },
+        { name: 'movepool', getFn: obj => collectSearchTerms(getMoveNames(obj.movepool)) },
+        { name: 'tagShiny', getFn: obj => collectSearchTerms(obj.tagShiny) },
+        { name: 'tagPokerus', getFn: obj => collectSearchTerms(obj.tagPokerus) }
+    ],
     threshold: 0.1,
     useExtendedSearch: true,
+    ignoreDiacritics: true,
     ignoreLocation: true,
     minMatchCharLength: 1
 })
@@ -4248,9 +4486,15 @@ if (document.getElementById("pokedex-search").value!="") {
 
 
 
-        div.innerHTML = `<span style="display:flex; white-space:nowrap">lvl ${pkmn[i].level} ${nameMarks}</span><img class="sprite-trim" src="img/pkmn/sprite/${i}.png">`
-        if (pkmn[i].shiny) div.innerHTML = `<span style="display:flex; white-space:nowrap">lvl ${pkmn[i].level} ${nameMarks}</span> <img class="sprite-trim" src="img/pkmn/shiny/${i}.png">`
-        if (pkmn[i].shiny && pkmn[i].shinyDisabled == true) div.innerHTML = `<span style="display:flex; white-space:nowrap">lvl ${pkmn[i].level} ${nameMarks}</span><img class="sprite-trim" src="img/pkmn/sprite/${i}.png">`
+        const levelLabel = t(
+            "pkmn.level.short",
+            "lvl {level}",
+            { level: pkmn[i].level }
+        )
+        div.innerHTML = `<span style="display:flex; white-space:nowrap">${levelLabel} ${nameMarks}</span><img class="sprite-trim" src="img/pkmn/sprite/${i}.png">`
+        if (pkmn[i].shiny) div.innerHTML = `<span style="display:flex; white-space:nowrap">${levelLabel} ${nameMarks}</span> <img class="sprite-trim" src="img/pkmn/shiny/${i}.png">`
+        if (pkmn[i].shiny && pkmn[i].shinyDisabled == true) div.innerHTML = `<span style="display:flex; white-space:nowrap">${levelLabel} ${nameMarks}</span><img class="sprite-trim" src="img/pkmn/sprite/${i}.png">`
+
 
         if (dexTeamSelect!==undefined) { //preview team display
             document.getElementById(`pokedex-filters-cancel`).style.display = "flex"
@@ -4306,7 +4550,12 @@ if (document.getElementById("pokedex-search").value!="") {
                 item[evoItemToUse].got--
                 document.getElementById("tooltipTop").style.display = "none"    
                 document.getElementById("tooltipMid").style.display = "none"
-                document.getElementById("tooltipBottom").innerHTML = `${format(pkmn[ pkmn[i].evolve()[evo].pkmn.id ].id)} has been unlocked!`
+                document.getElementById("tooltipBottom").innerHTML = t(
+                    "explore.areaEnd.unlockedPokemon",
+                    "{pokemon} has been unlocked!",
+                    { pokemon: format(pkmn[ pkmn[i].evolve()[evo].pkmn.id ].id) }
+                )
+
                 openTooltip()
                 updateItemBag()
                 
@@ -4413,11 +4662,31 @@ if (document.getElementById("pokedex-search").value!="") {
                 
                 item.abilityPatch.got--
                 
-                document.getElementById("tooltipTitle").innerHTML = `New ability!`
+                const abilityName = format(newAbility)
+                document.getElementById("tooltipTitle").innerHTML = t(
+                    "genetics.abilityPatch.title",
+                    "New ability!"
+                )
                 document.getElementById("tooltipTop").style.display = "none"    
-                document.getElementById("tooltipMid").innerHTML = `<div class="genetics-overview-tags"><div style="filter:hue-rotate(0deg)">★ ${format(newAbility)}</div></div>`
-                if (ability[newAbility].rarity===2) document.getElementById("tooltipMid").innerHTML = `<div class="genetics-overview-tags"><div style="filter:hue-rotate(100deg)">★ ${format(newAbility)} (Uncommon!)</div></div>`
-                if (ability[newAbility].rarity===3) document.getElementById("tooltipMid").innerHTML = `<div class="genetics-overview-tags"><div style="filter:hue-rotate(200deg)">★ ${format(newAbility)} (Rare!)</div></div>`
+                const abilityDefault = t(
+                    "genetics.abilityPatch.default",
+                    "★ {ability}",
+                    { ability: abilityName }
+                )
+                const abilityUncommon = t(
+                    "genetics.abilityPatch.uncommon",
+                    "★ {ability} (Uncommon!)",
+                    { ability: abilityName }
+                )
+                const abilityRare = t(
+                    "genetics.abilityPatch.rare",
+                    "★ {ability} (Rare!)",
+                    { ability: abilityName }
+                )
+                document.getElementById("tooltipMid").innerHTML = `<div class="genetics-overview-tags"><div style="filter:hue-rotate(0deg)">${abilityDefault}</div></div>`
+                if (ability[newAbility].rarity===2) document.getElementById("tooltipMid").innerHTML = `<div class="genetics-overview-tags"><div style="filter:hue-rotate(100deg)">${abilityUncommon}</div></div>`
+                if (ability[newAbility].rarity===3) document.getElementById("tooltipMid").innerHTML = `<div class="genetics-overview-tags"><div style="filter:hue-rotate(200deg)">${abilityRare}</div></div>`
+
         
                 document.getElementById("tooltipBottom").style.display = "none" 
                 openTooltip()
@@ -4535,9 +4804,17 @@ if (document.getElementById("pokedex-search").value!="") {
     }
 
 
-    document.getElementById(`pokedex-total`).innerHTML = `Caught: ${gotPokemon}/${totalPokemon}`
-    if (gotPokemon == totalPokemon) {document.getElementById(`pokedex-total`).style.background = "rgba(187, 146, 85, 1)";     document.getElementById(`pokedex-total`).innerHTML = `Caught: ${gotPokemon}/${totalPokemon} <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><defs><mask id="SVGIz3eBe9X"><g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"><path d="M8 44h8m-4 0V4"/><path fill="#555555" d="M40 6H12v16h28l-4-8z"/></g></mask></defs><path fill="currentColor" d="M0 0h48v48H0z" mask="url(#SVGIz3eBe9X)"/></svg>`
-}
+    const pokedexTotalLabel = t(
+        "pokedex.caughtTotal",
+        "Caught: {current}/{total}",
+        { current: gotPokemon, total: totalPokemon }
+    )
+    document.getElementById(`pokedex-total`).innerHTML = pokedexTotalLabel
+    if (gotPokemon == totalPokemon) {
+        document.getElementById(`pokedex-total`).style.background = "rgba(187, 146, 85, 1)";
+        document.getElementById(`pokedex-total`).innerHTML = `${pokedexTotalLabel} <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><defs><mask id="SVGIz3eBe9X"><g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"><path d="M8 44h8m-4 0V4"/><path fill="#555555" d="M40 6H12v16h28l-4-8z"/></g></mask></defs><path fill="currentColor" d="M0 0h48v48H0z" mask="url(#SVGIz3eBe9X)"/></svg>`
+    }
+
     else document.getElementById(`pokedex-total`).style.background = "rgba(91, 114, 163, 1)"
 
     document.getElementById(`pokedex-total`).style.display = "flex"
@@ -4636,7 +4913,11 @@ function switchMenu(id){
         document.getElementById("tooltipTop").style.display = `none`
         document.getElementById("tooltipTitle").style.display = `none`
         document.getElementById("tooltipBottom").style.display = `none`
-        document.getElementById("tooltipMid").innerHTML = `Complete the tutorial first`
+        document.getElementById("tooltipMid").innerHTML = t(
+            "tutorial.completeFirst",
+            "Complete the tutorial first"
+        )
+
         openTooltip()
         return
     }
@@ -4645,7 +4926,10 @@ function switchMenu(id){
         document.getElementById("tooltipTop").style.display = `none`
         document.getElementById("tooltipTitle").style.display = `none`
         document.getElementById("tooltipBottom").style.display = `none`
-        document.getElementById("tooltipMid").innerHTML = `Defeat Gym Leader Brock in VS mode to unlock`
+        document.getElementById("tooltipMid").innerHTML = t(
+            "unlock.brock",
+            "Defeat Gym Leader Brock in VS mode to unlock"
+        )
         openTooltip()
         return
     }
@@ -4656,7 +4940,10 @@ function switchMenu(id){
         document.getElementById("tooltipTop").style.display = `none`
         document.getElementById("tooltipTitle").style.display = `none`
         document.getElementById("tooltipBottom").style.display = `none`
-        document.getElementById("tooltipMid").innerHTML = `Defeat Elite Four Lance in VS mode to unlock`
+        document.getElementById("tooltipMid").innerHTML = t(
+            "unlock.lance",
+            "Defeat Elite Four Lance in VS mode to unlock"
+        )
         openTooltip()
         return
     }
@@ -4665,7 +4952,10 @@ function switchMenu(id){
         document.getElementById("tooltipTop").style.display = `none`
         document.getElementById("tooltipTitle").style.display = `none`
         document.getElementById("tooltipBottom").style.display = `none`
-        document.getElementById("tooltipMid").innerHTML = `Defeat Gym Leader Misty in VS mode to unlock`
+        document.getElementById("tooltipMid").innerHTML = t(
+            "unlock.misty",
+            "Defeat Gym Leader Misty in VS mode to unlock"
+        )
         openTooltip()
         return
     }
@@ -4848,7 +5138,7 @@ function updateItemBag(){
 
         div.dataset.item = i
         if (item[i].type !== "tm") div.innerHTML = `<img src="img/items/${i}.png"> <span class="item-list-name">${format(i)}</span> <span>x${item[i].got}</span>`
-        if (item[i].move && move[item[i].move]) div.innerHTML = `<img src="img/items/tm${format(move[item[i].move].type)}.png"> <span class="item-list-name">${format(i)} <strong style="opacity:0.6; font-weight:200; white-space:nowrap; font-size:0.9rem; margin-left:0.2rem"> (${move[item[i].move].power} BP, ${format(move[item[i].move].split).slice(0, 3)})</strong> </span>  <span>x${item[i].got}</span>`
+        if (item[i].move && move[item[i].move]) div.innerHTML = `<img src="img/items/tm${move[item[i].move].type}.png"> <span class="item-list-name">${format(i)} <strong style="opacity:0.6; font-weight:200; white-space:nowrap; font-size:0.9rem; margin-left:0.2rem"> (${move[item[i].move].power} BP, ${format(move[item[i].move].split).slice(0, 3)})</strong> </span>  <span>x${item[i].got}</span>`
 
 
 
@@ -4864,7 +5154,12 @@ function updateItemBag(){
 
             document.getElementById("pokedex-filters-title").style.display = "flex"
             document.getElementById("pokedex-filters-cancel").style.display = "flex"
-            document.getElementById("pokedex-filters-title").innerHTML = `Select a Pokemon to teach ${format(item[i].move)}`
+            document.getElementById("pokedex-filters-title").innerHTML = t(
+                "pokedex.selectTeachMove",
+                "Select a Pokemon to teach {move}",
+                { move: format(item[i].move) }
+            )
+
             document.getElementById("menu-button-parent").style.display = "none"
             document.getElementById(`item-menu`).style.display = "none"
 
@@ -4890,7 +5185,11 @@ function updateItemBag(){
 
             document.getElementById("pokedex-filters-title").style.display = "flex"
             document.getElementById("pokedex-filters-cancel").style.display = "flex"
-            document.getElementById("pokedex-filters-title").innerHTML = `Select a Pokemon to use the ${format(i)}`
+            document.getElementById("pokedex-filters-title").innerHTML = t(
+                "pokedex.selectUseItem",
+                "Select a Pokemon to use the {item}",
+                { item: format(i) }
+            )
             document.getElementById("menu-button-parent").style.display = "none"
             document.getElementById(`item-menu`).style.display = "none"
 
@@ -4909,7 +5208,11 @@ function updateItemBag(){
 
             document.getElementById("pokedex-filters-title").style.display = "flex"
             document.getElementById("pokedex-filters-cancel").style.display = "flex"
-            document.getElementById("pokedex-filters-title").innerHTML = `Select a Pokemon to use the ${format(i)}`
+            document.getElementById("pokedex-filters-title").innerHTML = t(
+                "pokedex.selectUseItem",
+                "Select a Pokemon to use the {item}",
+                { item: format(i) }
+            )
             document.getElementById("menu-button-parent").style.display = "none"
             document.getElementById(`item-menu`).style.display = "none"
 
@@ -4928,7 +5231,11 @@ function updateItemBag(){
 
             document.getElementById("pokedex-filters-title").style.display = "flex"
             document.getElementById("pokedex-filters-cancel").style.display = "flex"
-            document.getElementById("pokedex-filters-title").innerHTML = `Select a Pokemon to use the ${format(i)}`
+            document.getElementById("pokedex-filters-title").innerHTML = t(
+                "pokedex.selectUseItem",
+                "Select a Pokemon to use the {item}",
+                { item: format(i) }
+            )
             document.getElementById("menu-button-parent").style.display = "none"
             document.getElementById(`item-menu`).style.display = "none"
 
@@ -5009,10 +5316,10 @@ function updateVS() {
         document.getElementById("vs-selector").innerHTML = `
             <div style="background: #465f96; outline: solid 1px #3d61ff; color: white; z-index: 2;"  onclick="updateVS()">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="m10.618 15.27l.817.788q.242.242.565.242t.566-.242l.816-.789h1.08q.343 0 .575-.232t.232-.575v-1.08l.789-.816q.242-.243.242-.566t-.242-.565l-.789-.817v-1.08q0-.343-.232-.575t-.575-.232h-1.083l-.95-.945q-.183-.186-.427-.186t-.43.186l-.95.945H9.538q-.344 0-.576.232t-.232.576v1.08l-.789.816Q7.7 11.677 7.7 12t.242.566l.789.816v1.08q0 .343.232.575t.576.232zM9.066 19h-2.45q-.667 0-1.141-.475T5 17.386v-2.451l-1.79-1.803q-.237-.243-.349-.534t-.111-.594q0-.301.112-.596t.347-.538L5 9.066v-2.45q0-.667.475-1.141T6.615 5h2.451l1.803-1.79q.243-.237.534-.349t.594-.111q.301 0 .596.112t.538.347L14.934 5h2.45q.667 0 1.142.475T19 6.615v2.451l1.79 1.803q.237.243.349.534t.111.594q0 .301-.111.596t-.348.538L19 14.934v2.45q0 .667-.475 1.142t-1.14.474h-2.451l-1.803 1.79q-.243.237-.534.349t-.594.111q-.301 0-.596-.111t-.538-.348zm.433-1l2.059 2.058q.173.173.442.173t.442-.173L14.502 18h2.882q.27 0 .443-.173t.173-.442V14.5l2.058-2.059q.173-.173.173-.442t-.173-.442L18 9.498V6.617q0-.27-.173-.443T17.385 6H14.5l-2.059-2.058Q12.27 3.77 12 3.77t-.442.173L9.498 6H6.617q-.27 0-.443.173T6 6.616v2.883l-2.058 2.059q-.173.173-.173.442t.173.442L6 14.502v2.882q0 .27.173.443t.443.173zM12 12"/></svg>
-            Trainers</div>
+            ${t("vs.selector.trainers", "Trainers")}</div>
             <div onclick="updateFrontier()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.5" d="M17 22H7a2 2 0 0 1-2-2v-8.818a.6.6 0 0 0-.1-.333L3.1 8.15a.6.6 0 0 1-.1-.333V2.6a.6.6 0 0 1 .6-.6h1.8a.6.6 0 0 1 .6.6v1.8a.6.6 0 0 0 .6.6h2.8a.6.6 0 0 0 .6-.6V2.6a.6.6 0 0 1 .6-.6h2.8a.6.6 0 0 1 .6.6v1.8a.6.6 0 0 0 .6.6h2.8a.6.6 0 0 0 .6-.6V2.6a.6.6 0 0 1 .6-.6h1.8a.6.6 0 0 1 .6.6v5.218a.6.6 0 0 1-.1.333l-1.8 2.698a.6.6 0 0 0-.1.333V20a2 2 0 0 1-2 2Z"/></svg>
-            Battle Frontier</div>
+            ${t("vs.selector.frontier", "Battle Frontier")}</div>
     `
 
 
@@ -5024,7 +5331,8 @@ function updateVS() {
     <div style="display:flex; gap:0.2rem" >
     <span >
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="m10.618 15.27l.817.788q.242.242.565.242t.566-.242l.816-.789h1.08q.343 0 .575-.232t.232-.575v-1.08l.789-.816q.242-.243.242-.566t-.242-.565l-.789-.817v-1.08q0-.343-.232-.575t-.575-.232h-1.083l-.95-.945q-.183-.186-.427-.186t-.43.186l-.95.945H9.538q-.344 0-.576.232t-.232.576v1.08l-.789.816Q7.7 11.677 7.7 12t.242.566l.789.816v1.08q0 .343.232.575t.576.232zM9.066 19h-2.45q-.667 0-1.141-.475T5 17.386v-2.451l-1.79-1.803q-.237-.243-.349-.534t-.111-.594q0-.301.112-.596t.347-.538L5 9.066v-2.45q0-.667.475-1.141T6.615 5h2.451l1.803-1.79q.243-.237.534-.349t.594-.111q.301 0 .596.112t.538.347L14.934 5h2.45q.667 0 1.142.475T19 6.615v2.451l1.79 1.803q.237.243.349.534t.111.594q0 .301-.111.596t-.348.538L19 14.934v2.45q0 .667-.475 1.142t-1.14.474h-2.451l-1.803 1.79q-.243.237-.534.349t-.594.111q-.301 0-.596-.111t-.538-.348zm.433-1l2.059 2.058q.173.173.442.173t.442-.173L14.502 18h2.882q.27 0 .443-.173t.173-.442V14.5l2.058-2.059q.173-.173.173-.442t-.173-.442L18 9.498V6.617q0-.27-.173-.443T17.385 6H14.5l-2.059-2.058Q12.27 3.77 12 3.77t-.442.173L9.498 6H6.617q-.27 0-.443.173T6 6.616v2.883l-2.058 2.059q-.173.173-.173.442t.173.442L6 14.502v2.882q0 .27.173.443t.443.173zM12 12"/></svg>
-    VS Trainers
+${t("vs.header", "VS Trainers")}
+
     </span>
     <span class="header-help" data-help="VS"><svg  style="opacity:0.8; pointer-events:none" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><g fill="currentColor"><g opacity="0.2"><path d="M12.739 17.213a2 2 0 1 1-4 0a2 2 0 0 1 4 0"/><path fill-rule="evenodd" d="M10.71 5.765c-.67 0-1.245.2-1.65.486c-.39.276-.583.597-.639.874a1.45 1.45 0 0 1-2.842-.574c.227-1.126.925-2.045 1.809-2.67c.92-.65 2.086-1.016 3.322-1.016c2.557 0 5.208 1.71 5.208 4.456c0 1.59-.945 2.876-2.169 3.626a1.45 1.45 0 1 1-1.514-2.474c.57-.349.783-.794.783-1.152c0-.574-.715-1.556-2.308-1.556" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10.71 9.63c.8 0 1.45.648 1.45 1.45v1.502a1.45 1.45 0 1 1-2.9 0V11.08c0-.8.649-1.45 1.45-1.45" clip-rule="evenodd"/><path fill-rule="evenodd" d="M14.239 8.966a1.45 1.45 0 0 1-.5 1.99l-2.284 1.367a1.45 1.45 0 0 1-1.49-2.488l2.285-1.368a1.45 1.45 0 0 1 1.989.5" clip-rule="evenodd"/></g><path d="M11 16.25a1.25 1.25 0 1 1-2.5 0a1.25 1.25 0 0 1 2.5 0"/><path fill-rule="evenodd" d="M9.71 4.065c-.807 0-1.524.24-2.053.614c-.51.36-.825.826-.922 1.308a.75.75 0 1 1-1.47-.297c.186-.922.762-1.696 1.526-2.236c.796-.562 1.82-.89 2.919-.89c2.325 0 4.508 1.535 4.508 3.757c0 1.292-.768 2.376-1.834 3.029a.75.75 0 0 1-.784-1.28c.729-.446 1.118-1.093 1.118-1.749c0-1.099-1.182-2.256-3.008-2.256m0 5.265a.75.75 0 0 1 .75.75v1.502a.75.75 0 1 1-1.5 0V10.08a.75.75 0 0 1 .75-.75" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12.638 8.326a.75.75 0 0 1-.258 1.029l-2.285 1.368a.75.75 0 1 1-.77-1.287l2.285-1.368a.75.75 0 0 1 1.028.258" clip-rule="evenodd"/></g></svg></span>
     </div>
@@ -5066,10 +5374,11 @@ function updateVS() {
     }
 
 
-           let nameTag = "";
+            let nameTag = "";
        if (areas[i].reward.includes(item.goldenBottleCap)) nameTag = `<svg class="event-icon" style="color:#465f96" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12.795 2h-2c-1.886 0-2.829 0-3.414.586c-.586.586-.586 1.528-.586 3.414v3.5h10V6c0-1.886 0-2.828-.586-3.414S14.681 2 12.795 2" opacity="0.5"/><path fill="currentColor" fill-rule="evenodd" d="M13.23 5.783a3 3 0 0 0-2.872 0L5.564 8.397A3 3 0 0 0 4 11.031v4.938a3 3 0 0 0 1.564 2.634l4.794 2.614a3 3 0 0 0 2.872 0l4.795-2.614a3 3 0 0 0 1.564-2.634V11.03a3 3 0 0 0-1.564-2.634zM11.794 10.5c-.284 0-.474.34-.854 1.023l-.098.176c-.108.194-.162.29-.246.354s-.19.088-.399.135l-.19.044c-.739.167-1.108.25-1.195.532c-.088.283.163.577.666 1.165l.13.152c.144.167.215.25.247.354s.022.215 0 .438l-.02.203c-.076.785-.114 1.178.116 1.352s.575.015 1.266-.303l.179-.082c.196-.09.294-.135.398-.135s.203.045.399.135l.179.082c.69.319 1.036.477 1.266.303s.192-.567.116-1.352l-.02-.203c-.022-.223-.033-.334 0-.438c.032-.103.103-.187.246-.354l.13-.152c.504-.588.755-.882.667-1.165c-.088-.282-.457-.365-1.194-.532l-.191-.044c-.21-.047-.315-.07-.399-.135c-.084-.064-.138-.16-.246-.354l-.098-.176c-.38-.682-.57-1.023-.855-1.023" clip-rule="evenodd"/></svg>`
 
-
+        const areaName = getAreaName(i, areas[i])
+        const areaKey = i
 
         divAreas.className = `vs-card`
         divAreas.innerHTML = `
@@ -5078,15 +5387,16 @@ function updateVS() {
                 <img class="vs-card-flair" src="img/icons/pokeball.svg">
                 <div class="vs-card-bg"></div>
                     <span class="explore-ticket-left" style="z-index: 2;">
-                        <span id="trainer-name-${areas[i].name}" style="font-size:1.3rem">${areas[i].name}${nameTag}</span>
-                        <span><strong style="font-size:1rem; background:#465f96">Trainer Level ${Math.max(1,(areas[i].level))}</strong></span>
+                        <span id="trainer-name-${areaKey}" style="font-size:1.3rem">${areaName}${nameTag}</span>
+                        <span><strong style="font-size:1rem; background:#465f96">${t("vs.trainerLevel", "Trainer Level {level}", { level: Math.max(1,(areas[i].level)) })}</strong></span>
                     </span>
                 <div>
                 </div>
                 <div class="vs-card-left">
-                    <img id="trainer-image-${areas[i].name}" class="sprite-trim" src="img/trainers/${areas[i].sprite}.png">
+                    <img id="trainer-image-${areaKey}" class="sprite-trim" src="img/trainers/${areas[i].sprite}.png">
                 </div>
         `;
+
 
 
         
@@ -5096,8 +5406,12 @@ function updateVS() {
 
             if (!firstOne) {
             divAreas.style.filter = "brightness(0.3)"
-            document.getElementById(`trainer-image-${areas[i].name}`).style.filter = "brightness(0)"
-            document.getElementById(`trainer-name-${areas[i].name}`).innerHTML = "???"
+            document.getElementById(`trainer-image-${areaKey}`).style.filter = "brightness(0)"
+            document.getElementById(`trainer-name-${areaKey}`).innerHTML = t(
+                "vs.lockedTrainerName",
+                "???"
+            )
+
             
         }
         firstOne = false
@@ -5105,7 +5419,14 @@ function updateVS() {
 
  }
 
- if (document.getElementById(`vs-listing`).innerHTML == "") document.getElementById(`vs-listing`).innerHTML = `<div style="display:flex; flex-direction:column; justify-content:center; align-items:center; background:#ECDEB7; border-radius:0.3rem; height:15rem; width:15rem; text-align:center"><img src="img/pkmn/sprite/pikachuRockstar.png">All trainers defeated!<br><span style="font-size:0.9rem; opacity:0.7">How about the Battle Frontier?</span></div>`
+ if (document.getElementById(`vs-listing`).innerHTML == "") {
+    const vsAllDefeatedMessage = t(
+        "vs.allDefeated",
+        "All trainers defeated!<br><span style=\"font-size:0.9rem; opacity:0.7\">How about the Battle Frontier?</span>"
+    )
+    document.getElementById(`vs-listing`).innerHTML = `<div style="display:flex; flex-direction:column; justify-content:center; align-items:center; background:#ECDEB7; border-radius:0.3rem; height:15rem; width:15rem; text-align:center"><img src="img/pkmn/sprite/pikachuRockstar.png">${vsAllDefeatedMessage}</div>`
+ }
+
 
 }
 
@@ -5312,7 +5633,7 @@ function updateFrontier() {
         document.getElementById("tooltipTop").style.display = "none"
         document.getElementById("tooltipBottom").style.display = "none"
         document.getElementById("tooltipTitle").style.display = "none"
-        document.getElementById("tooltipMid").innerHTML = `Defeat Team Leader Giovanni in VS mode to unlock`
+        document.getElementById("tooltipMid").innerHTML = t("explore.event.lockGiovanni", "Defeat Team Leader Giovanni in VS mode to unlock")
         openTooltip()
         return
 
@@ -5326,10 +5647,10 @@ function updateFrontier() {
         document.getElementById("vs-selector").innerHTML = `
             <div   onclick="updateVS()">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="m10.618 15.27l.817.788q.242.242.565.242t.566-.242l.816-.789h1.08q.343 0 .575-.232t.232-.575v-1.08l.789-.816q.242-.243.242-.566t-.242-.565l-.789-.817v-1.08q0-.343-.232-.575t-.575-.232h-1.083l-.95-.945q-.183-.186-.427-.186t-.43.186l-.95.945H9.538q-.344 0-.576.232t-.232.576v1.08l-.789.816Q7.7 11.677 7.7 12t.242.566l.789.816v1.08q0 .343.232.575t.576.232zM9.066 19h-2.45q-.667 0-1.141-.475T5 17.386v-2.451l-1.79-1.803q-.237-.243-.349-.534t-.111-.594q0-.301.112-.596t.347-.538L5 9.066v-2.45q0-.667.475-1.141T6.615 5h2.451l1.803-1.79q.243-.237.534-.349t.594-.111q.301 0 .596.112t.538.347L14.934 5h2.45q.667 0 1.142.475T19 6.615v2.451l1.79 1.803q.237.243.349.534t.111.594q0 .301-.111.596t-.348.538L19 14.934v2.45q0 .667-.475 1.142t-1.14.474h-2.451l-1.803 1.79q-.243.237-.534.349t-.594.111q-.301 0-.596-.111t-.538-.348zm.433-1l2.059 2.058q.173.173.442.173t.442-.173L14.502 18h2.882q.27 0 .443-.173t.173-.442V14.5l2.058-2.059q.173-.173.173-.442t-.173-.442L18 9.498V6.617q0-.27-.173-.443T17.385 6H14.5l-2.059-2.058Q12.27 3.77 12 3.77t-.442.173L9.498 6H6.617q-.27 0-.443.173T6 6.616v2.883l-2.058 2.059q-.173.173-.173.442t.173.442L6 14.502v2.882q0 .27.173.443t.443.173zM12 12"/></svg>
-            Trainers</div>
+            ${t("vs.selector.trainers", "Trainers")}</div>
             <div style="background: #964646ff; outline: solid 1px #ff3d3dff; color: white; z-index: 2;" onclick="updateFrontier()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.5" d="M17 22H7a2 2 0 0 1-2-2v-8.818a.6.6 0 0 0-.1-.333L3.1 8.15a.6.6 0 0 1-.1-.333V2.6a.6.6 0 0 1 .6-.6h1.8a.6.6 0 0 1 .6.6v1.8a.6.6 0 0 0 .6.6h2.8a.6.6 0 0 0 .6-.6V2.6a.6.6 0 0 1 .6-.6h2.8a.6.6 0 0 1 .6.6v1.8a.6.6 0 0 0 .6.6h2.8a.6.6 0 0 0 .6-.6V2.6a.6.6 0 0 1 .6-.6h1.8a.6.6 0 0 1 .6.6v5.218a.6.6 0 0 1-.1.333l-1.8 2.698a.6.6 0 0 0-.1.333V20a2 2 0 0 1-2 2Z"/></svg>
-            Battle Frontier</div>
+            ${t("vs.selector.frontier", "Battle Frontier")}</div>
     `
 
 
@@ -5339,10 +5660,14 @@ function updateFrontier() {
     const cupsvg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 16c-5.76 0-6.78-5.74-6.96-10.294c-.051-1.266-.076-1.9.4-2.485c.475-.586 1.044-.682 2.183-.874A26.4 26.4 0 0 1 12 2c1.784 0 3.253.157 4.377.347c1.139.192 1.708.288 2.184.874s.45 1.219.4 2.485C18.781 10.26 17.761 16 12.001 16" opacity="0.5"/><path fill="currentColor" d="m17.64 12.422l2.817-1.565c.752-.418 1.128-.627 1.336-.979C22 9.526 22 9.096 22 8.235v-.073c0-1.043 0-1.565-.283-1.958s-.778-.558-1.768-.888L19 5l-.017.085q-.008.283-.022.621c-.088 2.225-.377 4.733-1.32 6.716M5.04 5.706c.087 2.225.376 4.733 1.32 6.716l-2.817-1.565c-.752-.418-1.129-.627-1.336-.979S2 9.096 2 8.235v-.073c0-1.043 0-1.565.283-1.958s.778-.558 1.768-.888L5 5l.017.087q.008.281.022.62"/><path fill="currentColor" fill-rule="evenodd" d="M5.25 22a.75.75 0 0 1 .75-.75h12a.75.75 0 0 1 0 1.5H6a.75.75 0 0 1-.75-.75" clip-rule="evenodd"/><path fill="currentColor" d="M15.458 21.25H8.542l.297-1.75a1 1 0 0 1 .98-.804h4.361a1 1 0 0 1 .98.804z" opacity="0.5"/><path fill="currentColor" d="M12 16q-.39 0-.75-.034v2.73h1.5v-2.73A8 8 0 0 1 12 16"/></svg>`
     
     let divisionText = ``
-    if (rotationFrontierCurrent==1) divisionText = `<span style="font-size: 1.5rem; padding:0">${cupsvg}Little Cup${cupsvg}</span><div>${returnDivisionLetter("C")} division and below only</div>`
-    if (rotationFrontierCurrent==2) divisionText = `<span style="font-size: 1.5rem; padding:0">${cupsvg}Great League${cupsvg}</span><div>${returnDivisionLetter("B")} division and below only</div>`
-    if (rotationFrontierCurrent==3) divisionText = `<span style="font-size: 1.5rem; padding:0">${cupsvg}Ultra League${cupsvg}</span><div>${returnDivisionLetter("A")} division and below only</div>`
-    if (rotationFrontierCurrent==4) divisionText = `<span style="font-size: 1.5rem; padding:0">${cupsvg}Master League${cupsvg}</span><div>${returnDivisionLetter("S")} division and below only</div>`
+    if (rotationFrontierCurrent==1) divisionText = `<span style="font-size: 1.5rem; padding:0">${cupsvg}${t("frontier.league.little", "Little Cup")}${cupsvg}</span><div>${t("frontier.league.divisionOnly", "{division} division and below only", { division: returnDivisionLetter("C") })}</div>`
+
+    if (rotationFrontierCurrent==2) divisionText = `<span style="font-size: 1.5rem; padding:0">${cupsvg}${t("frontier.league.great", "Great League")}${cupsvg}</span><div>${t("frontier.league.divisionOnly", "{division} division and below only", { division: returnDivisionLetter("B") })}</div>`
+
+    if (rotationFrontierCurrent==3) divisionText = `<span style="font-size: 1.5rem; padding:0">${cupsvg}${t("frontier.league.ultra", "Ultra League")}${cupsvg}</span><div>${t("frontier.league.divisionOnly", "{division} division and below only", { division: returnDivisionLetter("A") })}</div>`
+
+    if (rotationFrontierCurrent==4) divisionText = `<span style="font-size: 1.5rem; padding:0">${cupsvg}${t("frontier.league.master", "Master League")}${cupsvg}</span><div>${t("frontier.league.divisionOnly", "{division} division and below only", { division: returnDivisionLetter("S") })}</div>`
+
     
     
     document.getElementById(`frontier-listing`).innerHTML = `<div class="frontier-league">${divisionText}</div>`
@@ -5355,7 +5680,8 @@ function updateFrontier() {
     <div style="display:flex; gap:0.2rem" >
     <span >
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.5" d="M17 22H7a2 2 0 0 1-2-2v-8.818a.6.6 0 0 0-.1-.333L3.1 8.15a.6.6 0 0 1-.1-.333V2.6a.6.6 0 0 1 .6-.6h1.8a.6.6 0 0 1 .6.6v1.8a.6.6 0 0 0 .6.6h2.8a.6.6 0 0 0 .6-.6V2.6a.6.6 0 0 1 .6-.6h2.8a.6.6 0 0 1 .6.6v1.8a.6.6 0 0 0 .6.6h2.8a.6.6 0 0 0 .6-.6V2.6a.6.6 0 0 1 .6-.6h1.8a.6.6 0 0 1 .6.6v5.218a.6.6 0 0 1-.1.333l-1.8 2.698a.6.6 0 0 0-.1.333V20a2 2 0 0 1-2 2Z"/></svg>
-    VS Frontier
+    ${t("frontier.header", "VS Frontier")}
+
     </span>
     <span class="header-help" data-help="Frontier"><svg  style="opacity:0.8; pointer-events:none" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><g fill="currentColor"><g opacity="0.2"><path d="M12.739 17.213a2 2 0 1 1-4 0a2 2 0 0 1 4 0"/><path fill-rule="evenodd" d="M10.71 5.765c-.67 0-1.245.2-1.65.486c-.39.276-.583.597-.639.874a1.45 1.45 0 0 1-2.842-.574c.227-1.126.925-2.045 1.809-2.67c.92-.65 2.086-1.016 3.322-1.016c2.557 0 5.208 1.71 5.208 4.456c0 1.59-.945 2.876-2.169 3.626a1.45 1.45 0 1 1-1.514-2.474c.57-.349.783-.794.783-1.152c0-.574-.715-1.556-2.308-1.556" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10.71 9.63c.8 0 1.45.648 1.45 1.45v1.502a1.45 1.45 0 1 1-2.9 0V11.08c0-.8.649-1.45 1.45-1.45" clip-rule="evenodd"/><path fill-rule="evenodd" d="M14.239 8.966a1.45 1.45 0 0 1-.5 1.99l-2.284 1.367a1.45 1.45 0 0 1-1.49-2.488l2.285-1.368a1.45 1.45 0 0 1 1.989.5" clip-rule="evenodd"/></g><path d="M11 16.25a1.25 1.25 0 1 1-2.5 0a1.25 1.25 0 0 1 2.5 0"/><path fill-rule="evenodd" d="M9.71 4.065c-.807 0-1.524.24-2.053.614c-.51.36-.825.826-.922 1.308a.75.75 0 1 1-1.47-.297c.186-.922.762-1.696 1.526-2.236c.796-.562 1.82-.89 2.919-.89c2.325 0 4.508 1.535 4.508 3.757c0 1.292-.768 2.376-1.834 3.029a.75.75 0 0 1-.784-1.28c.729-.446 1.118-1.093 1.118-1.749c0-1.099-1.182-2.256-3.008-2.256m0 5.265a.75.75 0 0 1 .75.75v1.502a.75.75 0 1 1-1.5 0V10.08a.75.75 0 0 1 .75-.75" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12.638 8.326a.75.75 0 0 1-.258 1.029l-2.285 1.368a.75.75 0 1 1-.77-1.287l2.285-1.368a.75.75 0 0 1 1.028.258" clip-rule="evenodd"/></g></svg></span>
     </div>
@@ -5363,13 +5689,15 @@ function updateFrontier() {
     <div style="display:flex; gap:0.2rem">
     <div class="rotation-timer">
     <strong><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M6.94 2c.416 0 .753.324.753.724v1.46c.668-.012 1.417-.012 2.26-.012h4.015c.842 0 1.591 0 2.259.013v-1.46c0-.4.337-.725.753-.725s.753.324.753.724V4.25c1.445.111 2.394.384 3.09 1.055c.698.67.982 1.582 1.097 2.972L22 9H2v-.724c.116-1.39.4-2.302 1.097-2.972s1.645-.944 3.09-1.055V2.724c0-.4.337-.724.753-.724"/><path fill="currentColor" d="M22 14v-2c0-.839-.004-2.335-.017-3H2.01c-.013.665-.01 2.161-.01 3v2c0 3.771 0 5.657 1.172 6.828S6.228 22 10 22h4c3.77 0 5.656 0 6.828-1.172S22 17.772 22 14" opacity="0.5"/><path fill="currentColor" d="M18 17a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0"/></svg>
-    Rotation ${rotationFrontierCurrent}/${rotationFrontierMax}</strong>
+    ${t("explore.rotation", "Rotation {current}/{max}", { current: rotationFrontierCurrent, max: rotationFrontierMax })}</strong>
+
     <div class="time-counter-event"></div>
     </div>
 
     <div class="rotation-timer">
     <strong><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M6.94 2c.416 0 .753.324.753.724v1.46c.668-.012 1.417-.012 2.26-.012h4.015c.842 0 1.591 0 2.259.013v-1.46c0-.4.337-.725.753-.725s.753.324.753.724V4.25c1.445.111 2.394.384 3.09 1.055c.698.67.982 1.582 1.097 2.972L22 9H2v-.724c.116-1.39.4-2.302 1.097-2.972s1.645-.944 3.09-1.055V2.724c0-.4.337-.724.753-.724"/><path fill="currentColor" d="M22 14v-2c0-.839-.004-2.335-.017-3H2.01c-.013.665-.01 2.161-.01 3v2c0 3.771 0 5.657 1.172 6.828S6.228 22 10 22h4c3.77 0 5.656 0 6.828-1.172S22 17.772 22 14" opacity="0.5"/><path fill="currentColor" d="M18 17a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0"/></svg>
-    Trainer Reset</strong>
+    ${t("frontier.trainerReset", "Trainer Reset")}</strong>
+
     <div class="time-counter-daily"></div>
     </div>
     </div>
@@ -5398,8 +5726,14 @@ function updateFrontier() {
         #INF
         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M25.719 4.781a2.9 2.9 0 0 0-1.125.344l-4.719 2.5L13.5 6.062l-.375-.093l-.375.187l-2.156 1.25l-1.281.75l1.187.906l2.719 2.063l-3.406 1.813l-3.657-1.657l-.437-.187l-.438.219l-1.75.937l-1.156.625l.875.938l5.406 5.812l.5.594l.688-.375L15 17.094l-1.031 5.687l-.344 1.813l1.719-.719l2.562-1.094l.375-.156l.157-.375l3.718-9.031l5.25-2.813c1.446-.777 2.028-2.617 1.25-4.062a3 3 0 0 0-1.781-1.438a3.1 3.1 0 0 0-1.156-.125m.187 2c.125-.008.254-.004.375.032a.979.979 0 0 1 .188 1.812l-5.594 3.031l-.313.156l-.125.344l-3.718 8.938l-.438.187l1.063-5.906l.375-2.031l-1.813.969l-6.312 3.406l-3.969-4.313l.156-.094l3.657 1.626l.468.218l.406-.25l15.22-8.031a.9.9 0 0 1 .374-.094M13.375 8.094l3.844.937l-2.063 1.063l-2.25-1.719zM3 26v2h26v-2z"/></svg>
         </span>
-        <span style="font-size:1.2rem">Spiraling Tower</span>
-        <span><strong style="background:#964646ff">Highest Reached Floor: ${saved.maxSpiralFloor}</strong><span></span></span>
+        <span style="font-size:1.2rem">${t("help.spiral.title", "Spiraling Tower")}</span>
+
+        <span><strong style="background:#964646ff">${t(
+            "frontier.spiral.highestFloor",
+            "Highest Reached Floor: {floor}",
+            { floor: saved.maxSpiralFloor }
+        )}</strong><span></span></span>
+
         </span>
         </div>
         <div style="width: 8rem;" class="explore-ticket-right">
@@ -5476,6 +5810,8 @@ frontierArray.sort((a, b) => a.data.tier - b.data.tier);
         })
 
     
+        const areaKey = i
+
         divAreas.className = `vs-card`
         divAreas.innerHTML = `
                         <span class="hitbox"></span>
@@ -5484,14 +5820,15 @@ frontierArray.sort((a, b) => a.data.tier - b.data.tier);
                 <div class="vs-card-bg"></div>
                     <span class="explore-ticket-left" style="z-index: 2;">
                         <span style="font-size:1.3rem">${prefix}${i.replace(/frontier/gi, "")}${nameTag}</span>
-                        <span><strong style="font-size:1rem; background:#964646ff">Trainer Level ${Math.max(1,(areas[i].level))}</strong></span>
+                        <span><strong style="font-size:1rem; background:#964646ff">${t("vs.trainerLevel", "Trainer Level {level}", { level: Math.max(1,(areas[i].level)) })}</strong></span>
                     </span>
                 <div>
                 </div>
                 <div class="vs-card-left">
-                    <img id="trainer-image-${areas[i].name}" class="sprite-trim" src="img/trainers/${areas[i].sprite}.png">
+                    <img id="trainer-image-${areaKey}" class="sprite-trim" src="img/trainers/${areas[i].sprite}.png">
                 </div>
         `;
+
 
 
         document.getElementById(`frontier-listing`).appendChild(divAreas)
@@ -5869,12 +6206,19 @@ function claimExportReward(){
         document.getElementById("tooltipTop").style.display = `none`
         document.getElementById("tooltipTitle").style.display = `none`
         document.getElementById("tooltipBottom").style.display = `none`
-        document.getElementById("tooltipMid").innerHTML = `Defeat Gym Leader Brock in VS mode to unlock`
+        document.getElementById("tooltipMid").innerHTML = t(
+            "unlock.brock",
+            "Defeat Gym Leader Brock in VS mode to unlock"
+        )
         openTooltip()
         return
         }
 
-        document.getElementById("tooltipTitle").innerHTML = `Reward Received`
+        document.getElementById("tooltipTitle").innerHTML = t(
+            "reward.received",
+            "Reward Received"
+        )
+
         document.getElementById("tooltipMid").style.display = `none`
         
 
@@ -6026,8 +6370,16 @@ let geneticItemSelect = false
 
 
         document.getElementById("tooltipTop").style.display = `none`
-        document.getElementById("tooltipTitle").innerHTML = `Opration finished!<br>Do you want to use a genetic-aiding item?`
-        document.getElementById("tooltipMid").innerHTML = `The item will be consumed on use`
+        document.getElementById("tooltipTitle").innerHTML = t(
+            "genetics.completePrompt",
+            "Operation finished!<br>Do you want to use a genetic-aiding item?"
+        )
+
+        document.getElementById("tooltipMid").innerHTML = t(
+            "item.consumeWarning",
+            "The item will be consumed on use"
+        )
+
         document.getElementById("tooltipBottom").innerHTML = `
         
         <span style="display:flex; justify-content:center; align-items:center; width:100%">
@@ -6072,8 +6424,15 @@ let geneticItemSelect = false
 
 
         document.getElementById("tooltipTop").style.display = `none`
-        document.getElementById("tooltipTitle").innerHTML = `Are you sure you want to abort the operation?`
-        document.getElementById("tooltipMid").innerHTML = `Nothing but time will be lost`
+        document.getElementById("tooltipTitle").innerHTML = t(
+            "genetics.abortConfirm.title",
+            "Are you sure you want to abort the operation?"
+        )
+        document.getElementById("tooltipMid").innerHTML = t(
+            "genetics.abortConfirm.body",
+            "Nothing but time will be lost"
+        )
+
         document.getElementById("tooltipBottom").innerHTML = `<div onClick = "
 
         saved.geneticOperation = undefined;
@@ -6222,9 +6581,12 @@ document.getElementById("genetics-data-time").innerHTML = `${h}h ${m}m ${x}s`
 
 document.getElementById("genetics-warning").style.display = "none"
 if (powerCost>=8) document.getElementById("genetics-warning").style.display = "flex"
-if (powerCost==8) document.getElementById("genetics-warning").innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="28" d="M12 10l4 7h-8Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.4s" values="28;0"/></path><path d="M12 10l4 7h-8Z" opacity="0"><animate attributeName="d" begin="0.4s" dur="0.8s" keyTimes="0;0.25;1" repeatCount="indefinite" values="M12 10l4 7h-8Z;M12 4l9.25 16h-18.5Z;M12 4l9.25 16h-18.5Z"/><animate attributeName="opacity" begin="0.4s" dur="0.8s" keyTimes="0;0.1;0.75;1" repeatCount="indefinite" values="0;1;1;0"/></path></g></svg>Warning, high Power Cost! Only 5 out of 6 maximum IV's per stat will be inherited!`
-if (powerCost==10) document.getElementById("genetics-warning").innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="28" d="M12 10l4 7h-8Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.4s" values="28;0"/></path><path d="M12 10l4 7h-8Z" opacity="0"><animate attributeName="d" begin="0.4s" dur="0.8s" keyTimes="0;0.25;1" repeatCount="indefinite" values="M12 10l4 7h-8Z;M12 4l9.25 16h-18.5Z;M12 4l9.25 16h-18.5Z"/><animate attributeName="opacity" begin="0.4s" dur="0.8s" keyTimes="0;0.1;0.75;1" repeatCount="indefinite" values="0;1;1;0"/></path></g></svg>Warning, very high Power Cost! Only 4 out of 6 maximum IV's per stat will be inherited!`
-if (powerCost==12) document.getElementById("genetics-warning").innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="28" d="M12 10l4 7h-8Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.4s" values="28;0"/></path><path d="M12 10l4 7h-8Z" opacity="0"><animate attributeName="d" begin="0.4s" dur="0.8s" keyTimes="0;0.25;1" repeatCount="indefinite" values="M12 10l4 7h-8Z;M12 4l9.25 16h-18.5Z;M12 4l9.25 16h-18.5Z"/><animate attributeName="opacity" begin="0.4s" dur="0.8s" keyTimes="0;0.1;0.75;1" repeatCount="indefinite" values="0;1;1;0"/></path></g></svg>Warning, extreme Power Cost! Only 3 out of 6 maximum IV's per stat will be inherited!`
+if (powerCost==8) document.getElementById("genetics-warning").innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="28" d="M12 10l4 7h-8Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.4s" values="28;0"/></path><path d="M12 10l4 7h-8Z" opacity="0"><animate attributeName="d" begin="0.4s" dur="0.8s" keyTimes="0;0.25;1" repeatCount="indefinite" values="M12 10l4 7h-8Z;M12 4l9.25 16h-18.5Z;M12 4l9.25 16h-18.5Z"/><animate attributeName="opacity" begin="0.4s" dur="0.8s" keyTimes="0;0.1;0.75;1" repeatCount="indefinite" values="0;1;1;0"/></path></g></svg>${t("genetics.warning.highPower", "Warning, high Power Cost! Only 5 out of 6 maximum IVs per stat will be inherited!")}`
+
+if (powerCost==10) document.getElementById("genetics-warning").innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="28" d="M12 10l4 7h-8Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.4s" values="28;0"/></path><path d="M12 10l4 7h-8Z" opacity="0"><animate attributeName="d" begin="0.4s" dur="0.8s" keyTimes="0;0.25;1" repeatCount="indefinite" values="M12 10l4 7h-8Z;M12 4l9.25 16h-18.5Z;M12 4l9.25 16h-18.5Z"/><animate attributeName="opacity" begin="0.4s" dur="0.8s" keyTimes="0;0.1;0.75;1" repeatCount="indefinite" values="0;1;1;0"/></path></g></svg>${t("genetics.warning.veryHighPower", "Warning, very high Power Cost! Only 4 out of 6 maximum IVs per stat will be inherited!")}`
+
+if (powerCost==12) document.getElementById("genetics-warning").innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="28" d="M12 10l4 7h-8Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.4s" values="28;0"/></path><path d="M12 10l4 7h-8Z" opacity="0"><animate attributeName="d" begin="0.4s" dur="0.8s" keyTimes="0;0.25;1" repeatCount="indefinite" values="M12 10l4 7h-8Z;M12 4l9.25 16h-18.5Z;M12 4l9.25 16h-18.5Z"/><animate attributeName="opacity" begin="0.4s" dur="0.8s" keyTimes="0;0.1;0.75;1" repeatCount="indefinite" values="0;1;1;0"/></path></g></svg>${t("genetics.warning.extremePower", "Warning, extreme Power Cost! Only 3 out of 6 maximum IVs per stat will be inherited!")}`
+
 
 let shinyChance = 1/100
 if (saved.geneticHost== undefined || saved.geneticSample == undefined) shinyChance = 0
@@ -6268,10 +6630,13 @@ if (mod==="start"){
     if (pkmn[saved.geneticHost].pokerus) saved.geneticPokerus = true
 }
 
+const geneticsStartButton = document.getElementById("genetics-start")
+
 if (saved.geneticOperation !== undefined){
-    document.getElementById("genetics-start").textContent = "Abort"
-    document.getElementById("genetics-start").style.color = "coral"
-    document.getElementById("genetics-start").style.outlineColor = "coral"
+    geneticsStartButton.textContent = t("genetics.abort", "Abort")
+    geneticsStartButton.dataset.state = "abort"
+    geneticsStartButton.style.color = "coral"
+    geneticsStartButton.style.outlineColor = "coral"
     document.getElementById("genetics-progress").style.display = "flex"
     document.getElementById("genetics-arrow").style.animation = "genetics-arrow 2s infinite"
     document.getElementById("genetics-host").style.animation = "pkmn-active 0.5s infinite"
@@ -6279,19 +6644,22 @@ if (saved.geneticOperation !== undefined){
     document.getElementById("genetics-progress-bar").style.width = `${100 - (saved.geneticOperation / saved.geneticOperationTotal) * 100}%`;
 
 } else {
-    document.getElementById("genetics-start").textContent = "Start"
-    document.getElementById("genetics-start").style.color = "rgb(189, 123, 219)"
-    document.getElementById("genetics-start").style.outlineColor = "rgb(189, 123, 219)"
+    geneticsStartButton.textContent = t("genetics.start", "Start")
+    geneticsStartButton.dataset.state = "start"
+    geneticsStartButton.style.color = "rgb(189, 123, 219)"
+    geneticsStartButton.style.outlineColor = "rgb(189, 123, 219)"
     document.getElementById("genetics-progress").style.display = "none"
     document.getElementById("genetics-arrow").style.animation = "none"
     if (document.getElementById("genetics-host")) document.getElementById("genetics-host").style.animation = "none"
 }
 
 if (saved.geneticOperation <= 1){
-    document.getElementById("genetics-start").textContent = "Finish"
-    document.getElementById("genetics-start").style.color = "lawngreen"
-    document.getElementById("genetics-start").style.outlineColor = "lawngreen"
+    geneticsStartButton.textContent = t("genetics.finish", "Finish")
+    geneticsStartButton.dataset.state = "finish"
+    geneticsStartButton.style.color = "lawngreen"
+    geneticsStartButton.style.outlineColor = "lawngreen"
 }
+
 
 if (mod==="end"){
 
@@ -6302,14 +6670,14 @@ if (mod==="end"){
     pkmn[saved.geneticHost].level = 1
     pkmn[saved.geneticHost].exp = 1
 
-    if (rng(shinyChance)) {pkmn[saved.geneticHost].shiny = true; summaryTags += `<div style="filter:hue-rotate(100deg)">✦ Shiny Mutation!</div>` }
+    if (rng(shinyChance)) {pkmn[saved.geneticHost].shiny = true; summaryTags += `<div style="filter:hue-rotate(100deg)">${t("genetics.summary.shinyMutation", "✦ Shiny Mutation!")}</div>` }
 
     if (item == "destinyKnot"){ //ability swap
     const hostAbility = pkmn[saved.geneticHost].ability
     const sampleAbility = pkmn[saved.geneticSample].ability
     pkmn[saved.geneticHost].ability = sampleAbility
     pkmn[saved.geneticSample].ability = hostAbility
-    summaryTags += `<div style="filter:hue-rotate(-50deg)">★ Ability swapped!</div>`
+    summaryTags += `<div style="filter:hue-rotate(-50deg)">${t("genetics.summary.abilitySwapped", "★ Ability swapped!")}</div>`
     } else {
     const newAbility = learnPkmnAbility(saved.geneticHost,10) //boosted chance
     if (item=="everstone") {pkmn[saved.geneticHost].ability = newAbility; summaryTags += `<div style="filter:hue-rotate(-50deg)">★ New ability: ${format(newAbility)}!</div>`}
@@ -6324,7 +6692,15 @@ if (mod==="end"){
 
     //pass moves
     pkmn[saved.geneticSample].movepool.forEach(moveID => {
-        if (rng(moveChance) && !(pkmn[saved.geneticHost].movepool.includes(moveID)) && move[moveID].moveset!==undefined ) {pkmn[saved.geneticHost].movepool.push(moveID); summaryTags += `<div style="filter:hue-rotate(0deg)">◇ Move inherited: ${format(moveID)}!</div>`}
+if (rng(moveChance) && !(pkmn[saved.geneticHost].movepool.includes(moveID)) && move[moveID].moveset!==undefined ) {
+            pkmn[saved.geneticHost].movepool.push(moveID);
+            summaryTags += `<div style="filter:hue-rotate(0deg)">${t(
+                "genetics.summary.moveInherited",
+                "◇ Move inherited: {move}!",
+                { move: format(moveID) }
+            )}</div>`
+        }
+
     });
 
 
@@ -6377,12 +6753,12 @@ if (mod==="end"){
     if (powerCost==12) ivCap = 3
 
 
-    if (rng(ivChanceHp) && pkmn[saved.geneticHost].ivs.hp<Math.min(ivCap, pkmn[saved.geneticSample].ivs.hp)) {pkmn[saved.geneticHost].ivs.hp = Math.min(ivCap, pkmn[saved.geneticSample].ivs.hp) ; summaryTags += `<div style="filter:hue-rotate(200deg)">❖ HP Iv's inherited!</div>`}
-    if (rng(ivChanceAtk) && pkmn[saved.geneticHost].ivs.atk<Math.min(ivCap, pkmn[saved.geneticSample].ivs.atk)) {pkmn[saved.geneticHost].ivs.atk = Math.min(ivCap, pkmn[saved.geneticSample].ivs.atk) ; summaryTags += `<div style="filter:hue-rotate(200deg)">❖ Attack Iv's inherited!</div>`}
-    if (rng(ivChanceDef) && pkmn[saved.geneticHost].ivs.def<Math.min(ivCap, pkmn[saved.geneticSample].ivs.def)) {pkmn[saved.geneticHost].ivs.def = Math.min(ivCap, pkmn[saved.geneticSample].ivs.def) ; summaryTags += `<div style="filter:hue-rotate(200deg)">❖ Defense Iv's inherited!</div>`}
-    if (rng(ivChanceSatk) && pkmn[saved.geneticHost].ivs.satk<Math.min(ivCap, pkmn[saved.geneticSample].ivs.satk)) {pkmn[saved.geneticHost].ivs.satk = Math.min(ivCap, pkmn[saved.geneticSample].ivs.satk) ; summaryTags += `<div style="filter:hue-rotate(200deg)">❖ Special Attack Iv's inherited!</div>`}
-    if (rng(ivChanceSdef) && pkmn[saved.geneticHost].ivs.sdef<Math.min(ivCap, pkmn[saved.geneticSample].ivs.sdef)) {pkmn[saved.geneticHost].ivs.sdef = Math.min(ivCap, pkmn[saved.geneticSample].ivs.sdef) ; summaryTags += `<div style="filter:hue-rotate(200deg)">❖ Special Defense Iv's inherited!</div>`}
-    if (rng(ivChanceSpe) && pkmn[saved.geneticHost].ivs.spe<Math.min(ivCap, pkmn[saved.geneticSample].ivs.spe)) {pkmn[saved.geneticHost].ivs.spe = Math.min(ivCap, pkmn[saved.geneticSample].ivs.spe) ; summaryTags += `<div style="filter:hue-rotate(200deg)">❖ Speed Iv's inherited!</div>`}
+    if (rng(ivChanceHp) && pkmn[saved.geneticHost].ivs.hp<Math.min(ivCap, pkmn[saved.geneticSample].ivs.hp)) {pkmn[saved.geneticHost].ivs.hp = Math.min(ivCap, pkmn[saved.geneticSample].ivs.hp) ; summaryTags += `<div style="filter:hue-rotate(200deg)">${t("genetics.summary.ivInherited.hp", "❖ HP IVs inherited!")}</div>`}
+    if (rng(ivChanceAtk) && pkmn[saved.geneticHost].ivs.atk<Math.min(ivCap, pkmn[saved.geneticSample].ivs.atk)) {pkmn[saved.geneticHost].ivs.atk = Math.min(ivCap, pkmn[saved.geneticSample].ivs.atk) ; summaryTags += `<div style="filter:hue-rotate(200deg)">${t("genetics.summary.ivInherited.atk", "❖ Attack IVs inherited!")}</div>`}
+    if (rng(ivChanceDef) && pkmn[saved.geneticHost].ivs.def<Math.min(ivCap, pkmn[saved.geneticSample].ivs.def)) {pkmn[saved.geneticHost].ivs.def = Math.min(ivCap, pkmn[saved.geneticSample].ivs.def) ; summaryTags += `<div style="filter:hue-rotate(200deg)">${t("genetics.summary.ivInherited.def", "❖ Defense IVs inherited!")}</div>`}
+    if (rng(ivChanceSatk) && pkmn[saved.geneticHost].ivs.satk<Math.min(ivCap, pkmn[saved.geneticSample].ivs.satk)) {pkmn[saved.geneticHost].ivs.satk = Math.min(ivCap, pkmn[saved.geneticSample].ivs.satk) ; summaryTags += `<div style="filter:hue-rotate(200deg)">${t("genetics.summary.ivInherited.satk", "❖ Special Attack IVs inherited!")}</div>`}
+    if (rng(ivChanceSdef) && pkmn[saved.geneticHost].ivs.sdef<Math.min(ivCap, pkmn[saved.geneticSample].ivs.sdef)) {pkmn[saved.geneticHost].ivs.sdef = Math.min(ivCap, pkmn[saved.geneticSample].ivs.sdef) ; summaryTags += `<div style="filter:hue-rotate(200deg)">${t("genetics.summary.ivInherited.sdef", "❖ Special Defense IVs inherited!")}</div>`}
+    if (rng(ivChanceSpe) && pkmn[saved.geneticHost].ivs.spe<Math.min(ivCap, pkmn[saved.geneticSample].ivs.spe)) {pkmn[saved.geneticHost].ivs.spe = Math.min(ivCap, pkmn[saved.geneticSample].ivs.spe) ; summaryTags += `<div style="filter:hue-rotate(200deg)">${t("genetics.summary.ivInherited.spe", "❖ Speed IVs inherited!")}</div>`}
 
 
     for (const iv in pkmn[saved.geneticHost].ivs){
@@ -6401,19 +6777,20 @@ if (mod==="end"){
         
         if (newIv>ivId) {
             pkmn[saved.geneticHost].ivs[iv] = newIv
-            if (iv === "hp") summaryTags += `<div style="filter:hue-rotate(250deg)">◆ HP Iv's increased!</div>`
-            if (iv === "atk") summaryTags += `<div style="filter:hue-rotate(250deg)">◆ Attack Iv's increased!</div>`
-            if (iv === "def") summaryTags += `<div style="filter:hue-rotate(250deg)">◆ Defense Iv's increased!</div>`
-            if (iv === "satk") summaryTags += `<div style="filter:hue-rotate(250deg)">◆ Special Attack Iv's increased!</div>`
-            if (iv === "sdef") summaryTags += `<div style="filter:hue-rotate(250deg)">◆ Special Defense Iv's increased!</div>`
-            if (iv === "spe") summaryTags += `<div style="filter:hue-rotate(250deg)">◆ Speed Iv's increased!</div>`
+            if (iv === "hp") summaryTags += `<div style="filter:hue-rotate(250deg)">${t("genetics.summary.ivIncreased.hp", "◆ HP IVs increased!")}</div>`
+            if (iv === "atk") summaryTags += `<div style="filter:hue-rotate(250deg)">${t("genetics.summary.ivIncreased.atk", "◆ Attack IVs increased!")}</div>`
+            if (iv === "def") summaryTags += `<div style="filter:hue-rotate(250deg)">${t("genetics.summary.ivIncreased.def", "◆ Defense IVs increased!")}</div>`
+            if (iv === "satk") summaryTags += `<div style="filter:hue-rotate(250deg)">${t("genetics.summary.ivIncreased.satk", "◆ Special Attack IVs increased!")}</div>`
+            if (iv === "sdef") summaryTags += `<div style="filter:hue-rotate(250deg)">${t("genetics.summary.ivIncreased.sdef", "◆ Special Defense IVs increased!")}</div>`
+            if (iv === "spe") summaryTags += `<div style="filter:hue-rotate(250deg)">${t("genetics.summary.ivIncreased.spe", "◆ Speed IVs increased!")}</div>`
         }
     }
 
 
-    if (summaryTags == "") summaryTags = "No new genetic changes"
+    if (summaryTags == "") summaryTags = t("genetics.summary.none", "No new genetic changes")
     
-    document.getElementById("tooltipTitle").innerHTML = `Operation overview`
+    document.getElementById("tooltipTitle").innerHTML = t("genetics.summary.title", "Operation overview")
+
     document.getElementById("tooltipTop").style.display = "none"    
     document.getElementById("tooltipMid").innerHTML = `<div class="genetics-overview-tags" id="prevent-tooltip-exit">${summaryTags}</div>`
     document.getElementById("tooltipBottom").innerHTML = `<div style="display:flex;justify-content:center;align-items:center; width:100%; cursor:help"><div class="area-preview" data-pkmn-editor="${saved.geneticHost}"><img   class="sprite-trim" src="img/pkmn/sprite/${saved.geneticHost}.png"> </div></div>`
@@ -6436,7 +6813,8 @@ if (mod==="end"){
 setInterval(() => {
     if (saved.geneticOperation==undefined) return
     if (saved.geneticOperation===1)  {saved.geneticOperation--; setGeneticMenu();}
-    if (saved.geneticOperation<1 && document.getElementById("genetics-start").textContent == "Abort") setGeneticMenu();
+    if (saved.geneticOperation<1 && document.getElementById("genetics-start").dataset.state === "abort") setGeneticMenu();
+
     if (saved.geneticOperation==0) return
     if (saved.geneticOperation<0) saved.geneticOperation=1
     //if (document.visibilityState === "visible") saved.geneticOperation--
@@ -6474,8 +6852,10 @@ saved.trainingPokemon = undefined
 const training = {}
 
 training.level = {
-    name: `Level Training`,
-    info: `Fully max a Pokemon's level. Can only be done with less than Level 100`,
+    nameKey: "training.name.level",
+    name: "Level Training",
+    infoKey: "training.info.level",
+    info: "Fully max a Pokemon's level. Can only be done with less than Level 100",
     tier: 2,
     color: `#dfc969`,
     condition: function() { if (pkmn[saved.trainingPokemon].level<100 && areas.vsEliteTrainerCynthia.defeated == true) return true },
@@ -6504,8 +6884,10 @@ training.level = {
 }
 
 training.iv1 = { //disapears if you have more than x ivs
-    name: `IV Training I`,
-    info: `Gain 2 random IV stars. Can only be done with less than 10 IV stars`,
+    nameKey: "training.name.iv1",
+    name: "IV Training I",
+    infoKey: "training.info.iv1",
+    info: "Gain 2 random IV stars. Can only be done with less than 10 IV stars",
     tier: 1,
     color: `#699edf`,
     condition: function() {
@@ -6557,8 +6939,10 @@ training.iv1 = { //disapears if you have more than x ivs
 }
 
 training.iv2 = { //doesnt appear until you have more than x ivs
-    name: `IV Training II`,
-    info: `Gain 2 random IV stars. Can only be done with less than 22 IV stars`,
+    nameKey: "training.name.iv2",
+    name: "IV Training II",
+    infoKey: "training.info.iv2",
+    info: "Gain 2 random IV stars. Can only be done with less than 22 IV stars",
     tier: 2,
     color: `#699edf`,
     condition: function() {
@@ -6610,8 +6994,10 @@ training.iv2 = { //doesnt appear until you have more than x ivs
 }
 
 training.iv3 = { //doesnt appear until you have more than x ivs
-    name: `IV Training III`,
-    info: `Gain 2 random IV stars`,
+    nameKey: "training.name.iv3",
+    name: "IV Training III",
+    infoKey: "training.info.iv3",
+    info: "Gain 2 random IV stars",
     tier: 3,
     color: `#699edf`,
     condition: function() {
@@ -6663,8 +7049,10 @@ training.iv3 = { //doesnt appear until you have more than x ivs
 }
 
 training.ability = {
-    name: `Ability Training`,
-    info: `Rerolls the Pokemon Ability`,
+    nameKey: "training.name.ability",
+    name: "Ability Training",
+    infoKey: "training.info.ability",
+    info: "Rerolls the Pokemon Ability",
     tier: 1,
     color: `#69df96`,
     effect: function() {
@@ -6683,8 +7071,10 @@ training.ability = {
 }
 
 training.hiddenAbility = {
-    name: `Hidden Ability Training`,
-    info: `Unlocks the Pokemon Hidden Ability`,
+    nameKey: "training.name.hiddenAbility",
+    name: "Hidden Ability Training",
+    infoKey: "training.info.hiddenAbility",
+    info: "Unlocks the Pokemon Hidden Ability",
     tier: 2,
     color: `#69df96`,
     condition: function() { if (pkmn[saved.trainingPokemon].hiddenAbility && pkmn[saved.trainingPokemon].hiddenAbilityUnlocked!=true) return true },
@@ -6703,8 +7093,10 @@ training.hiddenAbility = {
 }
 
 training.move = { //disapears if you have 20+ moves or smth
-    name: `Move Training`,
-    info: `Learn a new Pokemon Move. Can only be done with less than 20 moves, or when a new move is available`,
+    nameKey: "training.name.move",
+    name: "Move Training",
+    infoKey: "training.info.move",
+    info: "Learn a new Pokemon Move. Can only be done with less than 20 moves, or when a new move is available",
     tier: 1,
     color: `#cf79c1`,
     condition: function() { if (learnPkmnMove(pkmn[saved.trainingPokemon].id, pkmn[saved.trainingPokemon].level)!=undefined && pkmn[saved.trainingPokemon].movepool.length<20) return true },
@@ -6769,9 +7161,12 @@ function setTrainingMenu() {
     div.dataset.training = i
     if (training[i].condition && training[i].condition()!=true) div.style.filter = "brightness(0.5)"
 
+    const trainingName = t(training[i].nameKey, training[i].name)
+    const difficultyLabel = t("training.difficulty.label", "Difficulty")
+
     div.innerHTML = `
-    <span>${training[i].name}</span>
-    <strong style="outline-color: ${training[i].color}; color: ${training[i].color}" >Difficulty: ${returnStars(training[i].tier)}</strong>
+    <span>${trainingName}</span>
+    <strong style="outline-color: ${training[i].color}; color: ${training[i].color}" >${difficultyLabel}: ${returnStars(training[i].tier)}</strong>
     `
     div.style.pointerEvents = "initial"
 
@@ -6806,8 +7201,16 @@ function setTrainingMenu() {
     if (restrictedError) {
         document.getElementById("tooltipTop").style.display = "none"
         document.getElementById("tooltipBottom").style.display = "none"
-        document.getElementById("tooltipTitle").innerHTML = `Restricted Moves`
-        document.getElementById("tooltipMid").innerHTML = `The training Pokemon has multiple restricted moves (${restrictedIcon}) equipped!`
+        document.getElementById("tooltipTitle").innerHTML = t(
+            "training.restricted.title",
+            "Restricted Moves"
+        )
+        document.getElementById("tooltipMid").innerHTML = t(
+            "training.restricted.body",
+            "The training Pokemon has multiple restricted moves ({icon}) equipped!",
+            { icon: restrictedIcon }
+        )
+
         openTooltip()
         return
     }
@@ -7136,14 +7539,21 @@ function claimMysteryGift(){
         document.getElementById("tooltipTop").style.display = `none`
         document.getElementById("tooltipTitle").style.display = `none`
         document.getElementById("tooltipBottom").style.display = `none`
-        document.getElementById("tooltipMid").innerHTML = `Defeat Gym Leader Brock in VS mode to unlock`
+        document.getElementById("tooltipMid").innerHTML = t(
+            "unlock.brock",
+            "Defeat Gym Leader Brock in VS mode to unlock"
+        )
         openTooltip()
         return
         }
 
     openMenu()
     document.getElementById("tooltipTop").innerHTML = `<img src="img/pkmn/shiny/${mysteryGift.icon}.png">`
-    document.getElementById("tooltipTitle").innerHTML = `Mystery Gift`
+    document.getElementById("tooltipTitle").innerHTML = t(
+        "menu.mysteryGift",
+        "Mystery Gift"
+    )
+
     document.getElementById("tooltipMid").innerHTML = `${mysteryGift.info}<br>You have until ${mysteryGift.duration.toLocaleString("en-US", {month: "long",day: "numeric"})} to claim`
     document.getElementById("tooltipBottom").innerHTML = `<span data-pkmn-editor=${mysteryGift.icon} id="mystery-claim-button"><img src="img/items/gift.png" style="scale:4; image-rendering:pixelated; padding: 3rem 0; cursor:help" 
     style="cursor:pointer; font-size:2rem" id="prevent-tooltip-exit"></span>`

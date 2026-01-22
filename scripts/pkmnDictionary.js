@@ -11,19 +11,6 @@ const evolutionLevel1 = 30
 const evolutionLevel2 = 50
 const evolutionLevel3 = 70
 
-pkmn.missingno = {
-    type: ["bird","normal"],
-    bst: {
-        hp: 33,
-        atk: 137,
-        def: 0,
-        satk: 6,
-        sdef: 29,
-        spe: 0,
-    },
-    evolve: function() { return { 1: { pkmn: pkmn.kangaskhan, level: 128 } } },
-    hidden: true
-}
 
 // 001 Bulbasaur → Ivysaur → Venusaur
 pkmn.bulbasaur = {
@@ -16766,7 +16753,33 @@ pkmn.singleStrikeUrshifuGmax = {
 
 
 
+pkmn.missingno = {
+    type: ["bird","normal"],
+    bst: {
+        hp: 33,
+        atk: 137,
+        def: 0,
+        satk: 6,
+        sdef: 29,
+        spe: 0,
+    },
+    evolve: function() { return { 1: { pkmn: pkmn.kangaskhan, level: 128 } } },
+    hidden: true
+}
 
+
+pkmn.f00 = {
+    type: ["steel","normal"],
+    bst: {
+        hp: 10,
+        atk: 10,
+        def: 10,
+        satk: 10,
+        sdef: 10,
+        spe: 10,
+    },
+    hidden: true
+}
 
 
 

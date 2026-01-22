@@ -2262,10 +2262,10 @@ move.furyCutter = {
 
 move.infestation = {  
     moveset: [`bug`],
-    split: "physical",
+    split: "special",
     rarity: 1,
     type: "bug",
-    power: 10,
+    power: 15,
     info: function() {return `Hits 2-5 times`},
     multihit: [2,5],
 }
@@ -2275,7 +2275,7 @@ move.pinMissile = {
     split: "physical",
     rarity: 2,
     type: "bug",
-    power: 25,
+    power: 20,
     info: function() {return `Hits 2-5 times`},
     multihit: [2,5],
 }

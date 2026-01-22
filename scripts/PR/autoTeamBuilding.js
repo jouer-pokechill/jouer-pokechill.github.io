@@ -59,6 +59,8 @@ function openAutoTeam(){
                 step="5"
                 value="50"
               />
+
+              ${itemCheckboxesHTML}
     </div>
 
     <div onClick = '
@@ -73,9 +75,7 @@ function openAutoTeam(){
     
     ` 
 
-    
-    document.getElementById("settings-auto-team-bias").value = 50
-  
+    setAutoTeamBiasFromPercent(50)
 
     openTooltip()
 }
@@ -339,13 +339,14 @@ function autoBuildTeam() {
   for (let i = 1; i <= 6; i++) {
     const slotKey = `slot${i}`
     const newPkmn = optimizedTeam[i - 1]
+    const lockThisItem = document.getElementById(`settings-auto-team-lock-item-${i}`)?.checked === true
 
     if (newPkmn) {
-      if (currentTeam[slotKey].pkmn !== newPkmn) currentTeam[slotKey].item = undefined
       currentTeam[slotKey].pkmn = newPkmn
+      if (!lockThisItem) currentTeam[slotKey].item = undefined
     } else {
       currentTeam[slotKey].pkmn = undefined
-      currentTeam[slotKey].item = undefined
+      if (!lockThisItem) currentTeam[slotKey].item = undefined
     }
   }
 

@@ -1356,7 +1356,6 @@ pkmn.meowthGmax = {
         sdef: 40*3,
         spe: 40*3,
     },
-    evolve: function() { return { 1: { pkmn: pkmn.persian, level: evolutionLevel2 } } },
     hiddenAbility: ability.technician,
     signature : move.payDay
 }
@@ -15105,7 +15104,7 @@ pkmn.lurantis = {
   bst: {
     hp: 70,
     atk: 105,
-    def: 90,
+    def: 70,
     satk: 80,
     sdef: 90,
     spe: 45,
@@ -18236,7 +18235,8 @@ pkmn.capsakid = {
     sdef: 40,
     spe: 50,
   },
-  evolve: function() { return { 1: { pkmn: pkmn.scovillain, level: evolutionLevel1 } } }
+  evolve: function() { return { 1: { pkmn: pkmn.scovillain, level: evolutionLevel1 } } },
+    hiddenAbility: ability.contrary,
 }
 
 pkmn.scovillain = {
@@ -18248,7 +18248,8 @@ pkmn.scovillain = {
     satk: 108,
     sdef: 65,
     spe: 75,
-  }
+  },
+    hiddenAbility: ability.contrary,
 }
 
 pkmn.megaScovillain = {
@@ -18260,7 +18261,8 @@ pkmn.megaScovillain = {
     satk: 138,
     sdef: 85,
     spe: 75,
-  }
+  },
+    hiddenAbility: ability.contrary,
 }
 
 // 953 Rellor → Rabsca
@@ -18490,7 +18492,8 @@ pkmn.orthworm = {
     satk: 60,
     sdef: 55,
     spe: 65,
-  }
+  },
+    hiddenAbility: ability.simple,
 }
 
 // 969 Glimmet → Glimmora
@@ -18504,7 +18507,8 @@ pkmn.glimmet = {
     sdef: 60,
     spe: 60,
   },
-  evolve: function() { return { 1: { pkmn: pkmn.glimmora, level: evolutionLevel1 } } }
+  evolve: function() { return { 1: { pkmn: pkmn.glimmora, level: evolutionLevel1 } } },
+    hiddenAbility: ability.corrosion,
 }
 
 pkmn.glimmora = {
@@ -18516,7 +18520,8 @@ pkmn.glimmora = {
     satk: 130,
     sdef: 81,
     spe: 86,
-  }
+  },
+    hiddenAbility: ability.corrosion,
 }
 
 pkmn.megaGlimmora = {
@@ -18528,7 +18533,8 @@ pkmn.megaGlimmora = {
     satk: 150,
     sdef: 96,
     spe: 101,
-  }
+  },
+    hiddenAbility: ability.corrosion,
 }
 
 // 971 Greavard → Houndstone

@@ -450,6 +450,7 @@ window.i18nData.en = {
     "genetics.inheritSdef": "% to inherit sample's Sp. Defense IVs",
     "genetics.inheritSpe": "% to inherit sample's Speed IVs",
     "genetics.warningHighPower": "Warning, power cost too high! Only 5 out of 6 maximum IVs per stat will be inherited!",
+    "genetics.pokerusWarning": "Pokerus detected on the host! Genetic compatibility is increased by one level!",
     "genetics.start": "Start",
     "shop.title": "Poke-Mart",
     "shop.category.goods": "Goods",

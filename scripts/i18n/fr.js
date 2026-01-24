@@ -450,6 +450,7 @@ window.i18nData.fr = {
     "genetics.inheritSdef": "% pour hériter des IV Défense Spé. de l’échantillon",
     "genetics.inheritSpe": "% pour hériter des IV Vitesse de l’échantillon",
     "genetics.warningHighPower": "Attention, coût en puissance trop élevé ! Seuls 5 IV sur 6 maximum par statistique seront hérités !",
+    "genetics.pokerusWarning": "Pokerus détecté sur l’hôte ! La compatibilité génétique augmente d’un niveau !",
     "genetics.start": "Démarrer",
     "shop.title": "Poké-Mart",
     "shop.category.goods": "Articles",

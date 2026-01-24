@@ -6654,7 +6654,8 @@ if (returnPkmnDivision(hostPkmn) === "SS")  powerCost = 10
 if (returnPkmnDivision(hostPkmn) === "SSS")  powerCost = 12
 }
 
-let compability = 1;
+    let compability = 1;
+    let isSameFamily = false;
 if (saved.geneticHost== undefined || saved.geneticSample == undefined) compability = 1
 else {
 
@@ -6665,16 +6666,20 @@ if (sharedType === 2) compability = 3;
 
 if (samplePkmn.id === "ditto") compability++
 
-document.getElementById("pokerus-warning").style.display = "none"
-if (pkmn[saved.geneticHost].pokerus || saved.geneticPokerus==true) compability++
-if (pkmn[saved.geneticHost].pokerus || saved.geneticPokerus==true) document.getElementById("pokerus-warning").style.display = "flex"
+    const pokerusWarning = document.getElementById("pokerus-warning")
+    if (pokerusWarning) pokerusWarning.style.display = "none"
+    if (pkmn[saved.geneticHost].pokerus || saved.geneticPokerus==true) compability++
+    if (pkmn[saved.geneticHost].pokerus || saved.geneticPokerus==true) {
+        if (pokerusWarning) pokerusWarning.style.display = "flex"
+    }
 
 
-const familyHost = getEvolutionFamily(hostPkmn);
-const familySample = getEvolutionFamily(samplePkmn);
-if (familyHost.has(samplePkmn) || familySample.has(hostPkmn)) {
-    compability = 4;
-}
+    const familyHost = getEvolutionFamily(hostPkmn);
+    const familySample = getEvolutionFamily(samplePkmn);
+    isSameFamily = familyHost.has(samplePkmn) || familySample.has(hostPkmn);
+    if (isSameFamily) {
+        compability = 4;
+    }
 
 
 
@@ -6710,14 +6715,15 @@ if (powerCost==10) document.getElementById("genetics-warning").innerHTML = `<svg
 if (powerCost==12) document.getElementById("genetics-warning").innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="28" d="M12 10l4 7h-8Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.4s" values="28;0"/></path><path d="M12 10l4 7h-8Z" opacity="0"><animate attributeName="d" begin="0.4s" dur="0.8s" keyTimes="0;0.25;1" repeatCount="indefinite" values="M12 10l4 7h-8Z;M12 4l9.25 16h-18.5Z;M12 4l9.25 16h-18.5Z"/><animate attributeName="opacity" begin="0.4s" dur="0.8s" keyTimes="0;0.1;0.75;1" repeatCount="indefinite" values="0;1;1;0"/></path></g></svg>${t("genetics.warning.extremePower", "Warning, extreme Power Cost! Only 3 out of 6 maximum IVs per stat will be inherited!")}`
 
 
-let shinyChance = 1/100
-if (saved.geneticHost== undefined || saved.geneticSample == undefined) shinyChance = 0
-else {
-if (samplePkmn.shiny && compability == 2) shinyChance = 1/25
-if (samplePkmn.shiny && compability == 3) shinyChance = 1/5
-if (samplePkmn.shiny && compability == 4) shinyChance = 1/1
-if (pkmn[saved.geneticHost].shiny) shinyChance = 0
-}
+    let shinyChance = 1/100
+    if (saved.geneticHost== undefined || saved.geneticSample == undefined) shinyChance = 0
+    else {
+    if (isSameFamily) shinyChance = 1/1
+    else if (samplePkmn.shiny && compability == 2) shinyChance = 1/25
+    else if (samplePkmn.shiny && compability == 3) shinyChance = 1/5
+    else if (samplePkmn.shiny && compability == 4) shinyChance = 1/1
+    if (pkmn[saved.geneticHost].shiny) shinyChance = 0
+    }
 
 
 document.getElementById("genetics-data-shiny").innerHTML = `${(  shinyChance*100  ).toFixed(0)}%`

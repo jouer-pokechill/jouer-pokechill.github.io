@@ -1,4 +1,4 @@
-# play-pokechill.github.io
+# jouer-pokechill.github.io
 Monsters and Chill
 
 play the original game at https://play-pokechill.github.io/
@@ -10,4 +10,5 @@ https://github.com/play-pokechill/play-pokechill.github.io
 
 Un grand merci à l'auteur du projet original pour son excellent travail ; ce fork s’appuie sur leur formidable base.
 
-Jouer au jeux français à http://jouer-pokechill.github.io/
+Jouer au jeux français à https://jouer-pokechill.github.io/
+

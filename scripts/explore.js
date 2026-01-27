@@ -812,64 +812,73 @@ function leaveCombat(){
     saved.spiralRewardsClaimed += rewardsToGive
     }
 
-    //battle factory rewards
-    const minimumScore = 1000 - (50 * (4 - rotationFrontierCurrent)) // 850, 900, 950, or 1000
-    if (battleFactoryScore !== 0 && (battleFactoryScore == saved.maxFactoryScore)) {
-        const baseThreshold = 150
-        const thresholdIncrease = (rotationFrontierCurrent - 1) * 50
-        const scoreThreshold = baseThreshold + thresholdIncrease // 100, 150, 200, or 250
-        
-        if (saved.maxFactoryScore >= minimumScore) {
-            const totalRewardsEarned = Math.floor((saved.maxFactoryScore - minimumScore) / scoreThreshold)
-            const rewardsToGive = totalRewardsEarned - (saved.factoryRewardsClaimed || 0)
-            
-            for (let i = 0; i < rewardsToGive; i++) {
-                const rewards = []
-                for (const i in spiralingRewards) {
-                    if (spiralingRewards[i].rarity === 2 && rng(0.3)) continue
-                    if (spiralingRewards[i].rarity === 3 && rng(0.6)) continue
-                    if (spiralingRewards[i].rarity === 4 && rng(0.8)) continue
-                    rewards.push(spiralingRewards[i].item)
-                }
-                const rewardId = arrayPick(rewards)
 
-                if (saved.factoryRewardsClaimed<30){
+
+//battle factory rewards
+const minimumScore = 1000 - (50 * (4 - rotationFrontierCurrent)) // 850, 900, 950, or 1000
+if (battleFactoryScore !== 0 && (battleFactoryScore == saved.maxFactoryScore)) {
+    const baseThreshold = 150
+    const thresholdIncrease = (rotationFrontierCurrent - 1) * 50
+    const scoreThreshold = baseThreshold + thresholdIncrease // 100, 150, 200, or 250
+    
+    if (saved.maxFactoryScore >= minimumScore) {
+        const totalRewardsEarned = Math.floor((saved.maxFactoryScore - minimumScore) / scoreThreshold)
+        const rewardsToGive = totalRewardsEarned - (saved.factoryRewardsClaimed || 0)
+        
+        for (let i = 0; i < rewardsToGive; i++) {
+            const currentRewardCount = (saved.factoryRewardsClaimed || 0) + i
+            
+            const rewards = []
+            for (const i in spiralingRewards) {
+                if (spiralingRewards[i].rarity === 2 && rng(0.3)) continue
+                if (spiralingRewards[i].rarity === 3 && rng(0.6)) continue
+                if (spiralingRewards[i].rarity === 4 && rng(0.8)) continue
+                rewards.push(spiralingRewards[i].item)
+            }
+            const rewardId = arrayPick(rewards)
+            if (currentRewardCount < 30){
                 item[rewardId].newItem++
                 item[rewardId].got++
-                }
-
-
+            }
+            if (currentRewardCount < 100){
                 item.goldenBottleCap.newItem++
                 item.goldenBottleCap.got++
             }
-            
-            saved.factoryRewardsClaimed = (saved.factoryRewardsClaimed || 0) + rewardsToGive
         }
-    }
-    if (saved.currentArea == areas.frontierBattleFactory.id){
-        const baseThreshold = 100
-        const thresholdIncrease = (rotationFrontierCurrent - 1) * 50
-        const scoreThreshold = baseThreshold + thresholdIncrease
-        const minimumScore = 1000 - (50 * (4 - rotationFrontierCurrent))
         
-        const div = document.createElement("span");
-        if (battleFactoryScore < minimumScore){
-            setTimeout(() => {
-                div.innerHTML = `Reach a minimum score of ${minimumScore} in order to get rewards`
-                document.getElementById("area-end-moves-title").appendChild(div);
-                document.getElementById("area-end-moves-title").style.display = "flex"          
-            }, 1);
-        } else {
-            const totalRewardsEarned = Math.floor((saved.maxFactoryScore - minimumScore) / scoreThreshold)
-            const nextRewardThreshold = minimumScore + (scoreThreshold * (totalRewardsEarned + 1))
-            const div2 = document.createElement("span");
-            setTimeout(() => {
-                div2.innerHTML = `Next reward at ${nextRewardThreshold} score`
-                document.getElementById("area-end-moves-title").appendChild(div2);
-                document.getElementById("area-end-moves-title").style.display = "flex"          
-            }, 1);
-        }
+        saved.factoryRewardsClaimed = (saved.factoryRewardsClaimed || 0) + rewardsToGive
     }
+}
+if (saved.currentArea == areas.frontierBattleFactory.id){
+    const baseThreshold = 100
+    const thresholdIncrease = (rotationFrontierCurrent - 1) * 50
+    const scoreThreshold = baseThreshold + thresholdIncrease
+    const minimumScore = 1000 - (50 * (4 - rotationFrontierCurrent))
+    
+    const div = document.createElement("span");
+    if (battleFactoryScore < minimumScore){
+        setTimeout(() => {
+            div.innerHTML = `Reach a minimum score of ${minimumScore} in order to get rewards`
+            document.getElementById("area-end-moves-title").appendChild(div);
+            document.getElementById("area-end-moves-title").style.display = "flex"          
+        }, 1);
+    } else if (saved.factoryRewardsClaimed >= 100) {
+        setTimeout(() => {
+            div.innerHTML = `No more rewards available. Maybe try getting a hi-score?`
+            document.getElementById("area-end-moves-title").appendChild(div);
+            document.getElementById("area-end-moves-title").style.display = "flex"          
+        }, 1);
+    } else {
+        const totalRewardsEarned = Math.floor((saved.maxFactoryScore - minimumScore) / scoreThreshold)
+        const nextRewardThreshold = minimumScore + (scoreThreshold * (totalRewardsEarned + 1))
+        const div2 = document.createElement("span");
+        setTimeout(() => {
+            div2.innerHTML = `Next reward at ${nextRewardThreshold} score`
+            document.getElementById("area-end-moves-title").appendChild(div2);
+            document.getElementById("area-end-moves-title").style.display = "flex"          
+        }, 1);
+    }
+}
 
 
 

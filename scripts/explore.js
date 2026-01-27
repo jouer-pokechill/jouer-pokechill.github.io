@@ -801,8 +801,15 @@ function leaveCombat(){
         item[rewardId].newItem++
         item[rewardId].got++
 
-        item.goldenBottleCap.newItem+=2
-        item.goldenBottleCap.got+=2
+        item.goldenBottleCap.newItem++
+        item.goldenBottleCap.got++
+
+        // extra every 3 rewards
+        if ((saved.spiralRewardsClaimed + i + 1) % 3 === 0) {
+            item.goldenBottleCap.newItem++
+            item.goldenBottleCap.got++
+        }
+
         
     }
 

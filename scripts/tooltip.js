@@ -141,7 +141,7 @@ function tooltipData(category, ttdata){
         if (listName === "uncommon") { tag = `<span>Uncommon</span>`; }
         div.className = "area-preview";
         if (item.type!=="tm") div.innerHTML = `<img style="scale:2" src="img/items/${item.id}.png">` + tag;
-        if (item.type=="tm") div.innerHTML = `<img style="scale:2" src="img/items/tm${format(move[item.move].type)}.png">` + tag;
+        if (item.type=="tm") div.innerHTML = `<img style="scale:2" src="img/items/tm${move[item.move].type}.png">` + tag;
         document.getElementById("area-preview-items").appendChild(div);
         }}
 
@@ -192,13 +192,8 @@ function tooltipData(category, ttdata){
         }
 
         if (areas[ttdata].reward !== undefined) {
-
-        
-
         document.getElementById("tooltipMid").innerHTML = `<div id="area-preview-items"><strong>Victory Rewards</strong></div>`;
-
         const rewards = areas[ttdata].reward;
-
         for (const i of rewards) {
         const div = document.createElement("div");
         document.getElementById("tooltipMid").style.display = "inline";
@@ -207,11 +202,47 @@ function tooltipData(category, ttdata){
         else {div.dataset.pkmn = i.id;}
         div.className = "area-preview";
         if (i.type!=="tm") div.innerHTML = `<img style="scale:2" src="img/${meow}/${i.id}.png">`;
-        if (i.type=="tm") div.innerHTML = `<img style="scale:2" src="img/${meow}/tm${format(move[i.move].type)}.png">` + tag;
+        if (i.type=="tm") div.innerHTML = `<img style="scale:2" src="img/${meow}/tm${move[i.move].type}.png">` + tag;
         if (meow == `pkmn/sprite`) div.innerHTML = `<img style="scale:1" src="img/${meow}/${i.id}.png">`;
         document.getElementById("area-preview-items").appendChild(div);
         }
+        }
+        
 
+        if (areas[ttdata].itemReward) { //new reward function ill eventually have to convert the rest of the code but for now im quite lazy
+            const tooltipMid = document.getElementById("tooltipMid");
+            tooltipMid.innerHTML = `<div id="area-preview-items"><strong>Victory Rewards</strong></div>`;
+            tooltipMid.style.display = "inline";
+            
+            const itemsContainer = document.getElementById("area-preview-items");
+            
+            Object.values(areas[ttdata].itemReward).forEach(reward => {
+                const div = document.createElement("div");
+                div.className = "area-preview";
+                
+                const itemData = item[reward.item];
+                const isPokemon = !itemData;
+                
+                let imgPath, scale;
+                if (isPokemon) {
+                    div.dataset.pkmn = reward.item;
+                    imgPath = `pkmn/sprite/${reward.item}`;
+                    scale = 1;
+                } else {
+                    div.dataset.item = reward.item;
+                    imgPath = itemData.type === "tm" 
+                        ? `items/tm${move[itemData.move].type}` 
+                        : `items/${reward.item}`;
+                    scale = 2;
+                }
+                
+                div.innerHTML = `<img style="scale:${scale}" src="img/${imgPath}.png" class="sprite-trim">`;
+                if (reward.amount > 1) {
+                    div.innerHTML += `<span>x${reward.amount}</span>`;
+                }
+                
+                itemsContainer.appendChild(div);
+            });
         }
 
         
@@ -258,10 +289,16 @@ function tooltipData(category, ttdata){
         if (ttdata === `Frontier`) document.getElementById("tooltipTitle").innerHTML = `Battle Frontier`
         if (ttdata === `Frontier`) document.getElementById("tooltipBottom").innerHTML = `The Battle Frontier houses different types of challenges under a specific division restriction that rotates every three days. Trainers fought here will reset every day`
 
-        if (ttdata === `Spiral`) document.getElementById("tooltipTitle").innerHTML = `Spiraling Tower`
-        if (ttdata === `Spiral`) document.getElementById("tooltipBottom").innerHTML = `The Spiraling Tower is an infinitely-scaling challenge in which every Pokemon defeated will increase the difficulty. Type Immunities inside this challenge will be instead converted to resistances<br><br>Every time you enter the tower, you will start from floor 1, but you can try as many times as you'd like<br><br>Your highest reached floor will be saved, and reset when the league rotation changes. You will be rewarded for every new highest floor reached at the end of the battle`
+        if (ttdata === `Spiral`) document.getElementById("tooltipTitle").innerHTML = `Battle Tower`
+        if (ttdata === `Spiral`) document.getElementById("tooltipBottom").innerHTML = `The Battle Tower is an infinitely-scaling challenge in which every Pokemon defeated will increase the difficulty. Type Immunities inside this challenge will be instead converted to resistances<br><br>Every time you enter the tower, you will start from floor 1, but you can try as many times as you'd like<br><br>Your highest reached floor will be saved, and reset when the league rotation changes. You will be rewarded for every new highest floor reached at the end of the battle`
         if (ttdata === `Spiral`) document.getElementById("tooltipMid").style.display = `inline`
         if (ttdata === `Spiral`) document.getElementById("tooltipMid").innerHTML = `Current Type Rotation: ${format(saved.currentSpiralingType)}`
+
+
+        if (ttdata === `BattleFactory`) document.getElementById("tooltipTitle").innerHTML = `Battle Factory`
+        if (ttdata === `BattleFactory`) document.getElementById("tooltipBottom").innerHTML = `The Battle Factory is a challenge in which your goal is to deal the maximum amount of damage. Every turn you will take a fixed amount of damage, and damage from status effects is disabled.<br><br>Every time you enter the factory, your score will reset, but you can try as many times as you'd like<br><br>Your highest reached score will be saved, and reset when the league rotation changes. You will be rewarded for your highest score reached at the end of the battle`
+        if (ttdata === `BattleFactory`) document.getElementById("tooltipMid").innerHTML = `<div id="area-preview-spawns" data-pkmn="${areas.frontierBattleFactory.icon.id}"><strong>Factory Pokemon</strong><img class="sprite-trim" src="img/pkmn/sprite/${areas.frontierBattleFactory.icon.id}.png"></div>`;
+        if (ttdata === `BattleFactory`) document.getElementById("tooltipMid").style.display = `inline`
 
         if (ttdata === `Wild Areas`) document.getElementById("tooltipTitle").innerHTML = `Wild Areas`
         if (ttdata === `Wild Areas`) document.getElementById("tooltipBottom").innerHTML = `All Pokemon in Wild Areas might be caught by defeating them. Wild Areas rotate every day, so be sure to check out what can be caught today!`
@@ -289,7 +326,7 @@ function tooltipData(category, ttdata){
 
 
         if (ttdata === `searchDictionary`) document.getElementById("tooltipTitle").innerHTML = `Keywords`
-        if (ttdata === `searchDictionary`) document.getElementById("tooltipBottom").innerHTML = `Operators:<br>![keyword]: Exclude from search<br>[keywordA] or [keywordB]: Search keywordA OR keywordB<br>[keywordA] [keywordB]: Search for keywordA AND keywordB<br><br>Pokemon keywords:<br>unobtainable, wild, park, event, frontier, shiny, caught, [type], [hidden ability]<br><br>Move keywords:<br>physical, special, [type], [ability]`
+        if (ttdata === `searchDictionary`) document.getElementById("tooltipBottom").innerHTML = `Operators:<br>![keyword]: Exclude from search<br>[keywordA] or [keywordB]: Search keywordA OR keywordB<br>[keywordA] [keywordB]: Search for keywordA AND keywordB<br><br>Pokemon keywords:<br>unobtainable, wild, park, event, frontier, mart, shiny, caught, [type], [hidden ability]<br><br>Move keywords:<br>physical, special, [type], [ability]`
         if (ttdata === `searchDictionary`) document.getElementById("dictionary-search").blur()
 
 
@@ -347,7 +384,7 @@ function tooltipData(category, ttdata){
 
         document.getElementById("tooltipTop").style.display = `inline`
         document.getElementById("tooltipTitle").style.display = `inline`
-        document.getElementById("tooltipTop").innerHTML = `<img src="img/items/tm${format(move[ttdata].type)}.png">`
+        document.getElementById("tooltipTop").innerHTML = `<img src="img/items/tm${move[ttdata].type}.png">`
         document.getElementById("tooltipTitle").innerHTML = format(ttdata)
         document.getElementById("tooltipMid").style.display = "inline"
 
@@ -375,7 +412,7 @@ function tooltipData(category, ttdata){
 
         document.getElementById("tooltipTop").style.display = "flex"
         if (item[ttdata].type !== "tm") document.getElementById("tooltipTop").innerHTML = `<img src="img/items/${ttdata}.png">`
-        if (item[ttdata].type == "tm") document.getElementById("tooltipTop").innerHTML = `<img src="img/items/tm${format(move[item[ttdata].move].type)}.png">`
+        if (item[ttdata].type == "tm") document.getElementById("tooltipTop").innerHTML = `<img src="img/items/tm${move[item[ttdata].move].type}.png">`
         
         document.getElementById("tooltipTitle").innerHTML = format(ttdata)
         document.getElementById("tooltipBottom").innerHTML = item[ttdata].info()
@@ -480,7 +517,21 @@ function tooltipData(category, ttdata){
         if (pkmn[ttdata].hiddenAbility != undefined) document.getElementById("inpect-pkmn-ability").dataset.ability = pkmn[ttdata].hiddenAbility.id
         if (pkmn[ttdata].signature != undefined) document.getElementById("inpect-pkmn-signature").dataset.move = pkmn[ttdata].signature.id
 
-        if (pkmn[ttdata].caught>0) {document.getElementById(`inspect-pkmn-image`).dataset.pkmnEditor = pkmn[ttdata].id;}
+        if (pkmn[ttdata].caught>0) {
+
+
+            //this is required because otherwise it would break if you try to edit a pkmn while editing a pkmn
+             document.getElementById(`inspect-pkmn-image`).addEventListener("contextmenu", e => {
+                closePkmnEditor()
+                setTimeout(() => {
+                    tooltipData('pkmnEditor', ttdata)
+                }, 200);
+             })
+
+
+        }
+        
+        
 
 
         openTooltip()
@@ -489,7 +540,6 @@ function tooltipData(category, ttdata){
 
 
     if (category == "pkmnEditor") {
-
 
 
 
@@ -516,6 +566,7 @@ function tooltipData(category, ttdata){
         if (pkmn[poke.id].shiny){
         document.getElementById("pkmn-shiny-switch").style.display = "flex"
         }
+
 
         let nameTag =""
         if (pkmn[poke.id].pokerus) nameTag = `<span data-help="Pokerus"><span style="color:white; background:${returnTypeColor("poison")}; padding:0 0.3rem; border-radius:3px; margin-left:0.3rem; cursor:help;">PKRS</span></span>`
@@ -857,7 +908,7 @@ const sortedMovepool = movepool
     }
 
 
-    if (areas[saved.currentArea]?.trainer && saved.currentArea != undefined ||  saved.currentArea == areas.frontierSpiralingTower.id ||  saved.currentArea == areas.training.id) {
+    if (areas[saved.currentArea]?.trainer && saved.currentArea != undefined ||  areas[saved.currentArea]?.type == "frontier" ||  saved.currentArea == areas.training.id) {
 
         document.getElementById("tooltipTop").style.display = "none"
         document.getElementById("tooltipBottom").style.display = "none"
@@ -992,7 +1043,7 @@ const sortedMovepool = movepool
 
         document.getElementById("tooltipTop").style.display = `inline`
         document.getElementById("tooltipTitle").style.display = `inline`
-        document.getElementById("tooltipTop").innerHTML = `<img src="img/items/tm${format(move[ttdata].type)}.png">`
+        document.getElementById("tooltipTop").innerHTML = `<img src="img/items/tm${move[ttdata].type}.png">`
         document.getElementById("tooltipTitle").innerHTML = format(ttdata)
         document.getElementById("tooltipMid").style.display = "inline"
 
@@ -1100,6 +1151,8 @@ const sortedMovepool = movepool
         if (eventSpawn != "") spawnLocation += `<span>Found in the event ${format(eventSpawn)} (Rotation ${areas[eventSpawn].rotation})</span>`
         if (spawnLocation == "") spawnLocation = `This Pokemon cannot be caught on its current stage`
         if (pkmn[ttdata].tagObtainedIn == "unobtainable") spawnLocation = `This Pokemon is unobtainable`
+        if (pkmn[ttdata].tagObtainedIn == "mart") spawnLocation = `Can be purchased in the Poke-Mart`
+        if (pkmn[ttdata].tagObtainedIn == "arceus") spawnLocation = `Unlocked while all obtainable Pokemon have been caught`
 
         document.getElementById("tooltipMid").innerHTML = `
         <span style="display:flex; flex-direction:column">${spawnLocation}<span>
@@ -1136,7 +1189,7 @@ const sortedMovepool = movepool
         document.getElementById("tooltipMid").style.display = "inline"
 
         if (item[ttdata].type !== "tm") document.getElementById("tooltipTop").innerHTML = `<img src="img/items/${ttdata}.png">`
-        if (item[ttdata].type == "tm") document.getElementById("tooltipTop").innerHTML = `<img src="img/items/tm${format(move[item[ttdata].move].type)}.png">`
+        if (item[ttdata].type == "tm") document.getElementById("tooltipTop").innerHTML = `<img src="img/items/tm${move[item[ttdata].move].type}.png">`
 
 
 

@@ -41,6 +41,13 @@ const isIOS = (() => {
   document.addEventListener("touchmove", () => clearTimeout(timer));
 })();
 
+function tmTypeIcon(type) {
+  if (!type) return "";
+
+  const normalized = String(type);
+  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+}
+
 
 
 //--Updates game version, used for firing retroactive features

@@ -937,7 +937,7 @@ function updateItemShop(){
     div.dataset.item = shop[i].icon
 
     if (item[i] && item[i].type=="tm"){ div.innerHTML = `
-    <img src="img/items/tm${move[item[i].move].type}.png">
+    <img src="img/items/tm${tmTypeIcon(move[item[i].move].type)}.png">
         <span>${name}</span>
     <strong>
         <img src="img/items/${currency}.png">

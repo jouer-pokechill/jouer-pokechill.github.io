@@ -673,7 +673,7 @@ function updateItemsGot(){
         divItem.dataset.item = i
 
         if (item[i].type !== "tm") divItem.innerHTML = `<img src="img/items/${i}.png"> <span>x${item[i].newItem}</span>`;
-        if (item[i].type == "tm") divItem.innerHTML = `<img src="img/items/tm${move[item[i].move].type}.png"> <span>x${item[i].newItem}</span>`;
+        if (item[i].type == "tm") divItem.innerHTML = `<img src="img/items/tm${tmTypeIcon(move[item[i].move].type)}.png"> <span>x${item[i].newItem}</span>`;
 
 
         document.getElementById("explore-drops").appendChild(divItem);
@@ -974,7 +974,7 @@ if (saved.currentArea == areas.frontierBattleFactory.id){
         divItem.className = "area-end-item";
         divItem.dataset.item = i
         if (item[i].type !== "tm") divItem.innerHTML = `<img src="img/items/${i}.png"><span>+${item[i].newItem}</span>`;
-        if (item[i].type == "tm") divItem.innerHTML = `<img src="img/items/tm${move[item[i].move].type}.png"><span>+${item[i].newItem}</span>`;
+        if (item[i].type == "tm") divItem.innerHTML = `<img src="img/items/tm${tmTypeIcon(move[item[i].move].type)}.png"><span>+${item[i].newItem}</span>`;
         document.getElementById("area-end-item-list").appendChild(divItem);
 
         item[i].newItem = 0;
@@ -5493,7 +5493,7 @@ function updateItemBag(){
 
         div.dataset.item = i
         if (item[i].type !== "tm") div.innerHTML = `<img src="img/items/${i}.png"> <span class="item-list-name">${format(i)}</span> <span>x${item[i].got}</span>`
-        if (item[i].move && move[item[i].move]) div.innerHTML = `<img src="img/items/tm${move[item[i].move].type}.png"> <span class="item-list-name">${format(i)} <strong style="opacity:0.6; font-weight:200; white-space:nowrap; font-size:0.9rem; margin-left:0.2rem"> (${move[item[i].move].power} BP, ${format(move[item[i].move].split).slice(0, 3)})</strong> </span>  <span>x${item[i].got}</span>`
+        if (item[i].move && move[item[i].move]) div.innerHTML = `<img src="img/items/tm${tmTypeIcon(move[item[i].move].type)}.png"> <span class="item-list-name">${format(i)} <strong style="opacity:0.6; font-weight:200; white-space:nowrap; font-size:0.9rem; margin-left:0.2rem"> (${move[item[i].move].power} BP, ${format(move[item[i].move].split).slice(0, 3)})</strong> </span>  <span>x${item[i].got}</span>`
 
 
 

@@ -141,7 +141,7 @@ function tooltipData(category, ttdata){
         if (listName === "uncommon") { tag = `<span>Uncommon</span>`; }
         div.className = "area-preview";
         if (item.type!=="tm") div.innerHTML = `<img style="scale:2" src="img/items/${item.id}.png">` + tag;
-        if (item.type=="tm") div.innerHTML = `<img style="scale:2" src="img/items/tm${move[item.move].type}.png">` + tag;
+        if (item.type=="tm") div.innerHTML = `<img style="scale:2" src="img/items/tm${tmTypeIcon(move[item.move].type)}.png">` + tag;
         document.getElementById("area-preview-items").appendChild(div);
         }}
 
@@ -202,7 +202,7 @@ function tooltipData(category, ttdata){
         else {div.dataset.pkmn = i.id;}
         div.className = "area-preview";
         if (i.type!=="tm") div.innerHTML = `<img style="scale:2" src="img/${meow}/${i.id}.png">`;
-        if (i.type=="tm") div.innerHTML = `<img style="scale:2" src="img/${meow}/tm${move[i.move].type}.png">` + tag;
+        if (i.type=="tm") div.innerHTML = `<img style="scale:2" src="img/${meow}/tm${tmTypeIcon(move[i.move].type)}.png">` + tag;
         if (meow == `pkmn/sprite`) div.innerHTML = `<img style="scale:1" src="img/${meow}/${i.id}.png">`;
         document.getElementById("area-preview-items").appendChild(div);
         }
@@ -231,7 +231,7 @@ function tooltipData(category, ttdata){
                 } else {
                     div.dataset.item = reward.item;
                     imgPath = itemData.type === "tm" 
-                        ? `items/tm${move[itemData.move].type}` 
+                        ? `items/tm${tmTypeIcon(move[itemData.move].type)}` 
                         : `items/${reward.item}`;
                     scale = 2;
                 }
@@ -384,7 +384,7 @@ function tooltipData(category, ttdata){
 
         document.getElementById("tooltipTop").style.display = `inline`
         document.getElementById("tooltipTitle").style.display = `inline`
-        document.getElementById("tooltipTop").innerHTML = `<img src="img/items/tm${move[ttdata].type}.png">`
+        document.getElementById("tooltipTop").innerHTML = `<img src="img/items/tm${tmTypeIcon(move[ttdata].type)}.png">`
         document.getElementById("tooltipTitle").innerHTML = format(ttdata)
         document.getElementById("tooltipMid").style.display = "inline"
 
@@ -412,7 +412,7 @@ function tooltipData(category, ttdata){
 
         document.getElementById("tooltipTop").style.display = "flex"
         if (item[ttdata].type !== "tm") document.getElementById("tooltipTop").innerHTML = `<img src="img/items/${ttdata}.png">`
-        if (item[ttdata].type == "tm") document.getElementById("tooltipTop").innerHTML = `<img src="img/items/tm${move[item[ttdata].move].type}.png">`
+        if (item[ttdata].type == "tm") document.getElementById("tooltipTop").innerHTML = `<img src="img/items/tm${tmTypeIcon(move[item[ttdata].move].type)}.png">`
         
         document.getElementById("tooltipTitle").innerHTML = format(ttdata)
         document.getElementById("tooltipBottom").innerHTML = item[ttdata].info()
@@ -1043,7 +1043,7 @@ const sortedMovepool = movepool
 
         document.getElementById("tooltipTop").style.display = `inline`
         document.getElementById("tooltipTitle").style.display = `inline`
-        document.getElementById("tooltipTop").innerHTML = `<img src="img/items/tm${move[ttdata].type}.png">`
+        document.getElementById("tooltipTop").innerHTML = `<img src="img/items/tm${tmTypeIcon(move[ttdata].type)}.png">`
         document.getElementById("tooltipTitle").innerHTML = format(ttdata)
         document.getElementById("tooltipMid").style.display = "inline"
 
@@ -1189,7 +1189,7 @@ const sortedMovepool = movepool
         document.getElementById("tooltipMid").style.display = "inline"
 
         if (item[ttdata].type !== "tm") document.getElementById("tooltipTop").innerHTML = `<img src="img/items/${ttdata}.png">`
-        if (item[ttdata].type == "tm") document.getElementById("tooltipTop").innerHTML = `<img src="img/items/tm${move[item[ttdata].move].type}.png">`
+        if (item[ttdata].type == "tm") document.getElementById("tooltipTop").innerHTML = `<img src="img/items/tm${tmTypeIcon(move[item[ttdata].move].type)}.png">`
 
 
 

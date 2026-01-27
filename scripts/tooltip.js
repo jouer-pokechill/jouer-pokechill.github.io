@@ -286,37 +286,37 @@ function tooltipData(category, ttdata){
         if (ttdata === `VS`) document.getElementById("tooltipTitle").innerHTML = `VS Trainers`
         if (ttdata === `VS`) document.getElementById("tooltipBottom").innerHTML = `Defeat increasingly difficult trainers and carve yourself a path of fame! You may unlock additional areas to explore as your progress`
 
-        if (ttdata === `Frontier`) document.getElementById("tooltipTitle").innerHTML = `Battle Frontier`
-        if (ttdata === `Frontier`) document.getElementById("tooltipBottom").innerHTML = `The Battle Frontier houses different types of challenges under a specific division restriction that rotates every three days. Trainers fought here will reset every day`
+        if (ttdata === `Frontier`) document.getElementById("tooltipTitle").innerHTML = t("help.frontier.title")
+        if (ttdata === `Frontier`) document.getElementById("tooltipBottom").innerHTML = t("help.frontier.body")
 
-        if (ttdata === `Spiral`) document.getElementById("tooltipTitle").innerHTML = `Battle Tower`
-        if (ttdata === `Spiral`) document.getElementById("tooltipBottom").innerHTML = `The Battle Tower is an infinitely-scaling challenge in which every Pokemon defeated will increase the difficulty. Type Immunities inside this challenge will be instead converted to resistances<br><br>Every time you enter the tower, you will start from floor 1, but you can try as many times as you'd like<br><br>Your highest reached floor will be saved, and reset when the league rotation changes. You will be rewarded for every new highest floor reached at the end of the battle`
+        if (ttdata === `Spiral`) document.getElementById("tooltipTitle").innerHTML = t("help.battle.title")
+        if (ttdata === `Spiral`) document.getElementById("tooltipBottom").innerHTML = t("help.battle.body")
         if (ttdata === `Spiral`) document.getElementById("tooltipMid").style.display = `inline`
-        if (ttdata === `Spiral`) document.getElementById("tooltipMid").innerHTML = `Current Type Rotation: ${format(saved.currentSpiralingType)}`
+        if (ttdata === `Spiral`) document.getElementById("tooltipMid").innerHTML = t("help.spiral.rotation", { type: format(saved.currentSpiralingType) })
 
 
-        if (ttdata === `BattleFactory`) document.getElementById("tooltipTitle").innerHTML = `Battle Factory`
-        if (ttdata === `BattleFactory`) document.getElementById("tooltipBottom").innerHTML = `The Battle Factory is a challenge in which your goal is to deal the maximum amount of damage. Every turn you will take a fixed amount of damage, and damage from status effects is disabled.<br><br>Every time you enter the factory, your score will reset, but you can try as many times as you'd like<br><br>Your highest reached score will be saved, and reset when the league rotation changes. You will be rewarded for your highest score reached at the end of the battle`
-        if (ttdata === `BattleFactory`) document.getElementById("tooltipMid").innerHTML = `<div id="area-preview-spawns" data-pkmn="${areas.frontierBattleFactory.icon.id}"><strong>Factory Pokemon</strong><img class="sprite-trim" src="img/pkmn/sprite/${areas.frontierBattleFactory.icon.id}.png"></div>`;
+        if (ttdata === `BattleFactory`) document.getElementById("tooltipTitle").innerHTML = t("help.factory.title")
+        if (ttdata === `BattleFactory`) document.getElementById("tooltipBottom").innerHTML = t("help.factory.body")
+        if (ttdata === `BattleFactory`) document.getElementById("tooltipMid").innerHTML = `<div id="area-preview-spawns" data-pkmn="${areas.frontierBattleFactory.icon.id}"><strong>${t("help.factory.pokemon")}</strong><img class="sprite-trim" src="img/pkmn/sprite/${areas.frontierBattleFactory.icon.id}.png"></div>`;
         if (ttdata === `BattleFactory`) document.getElementById("tooltipMid").style.display = `inline`
 
-        if (ttdata === `Wild Areas`) document.getElementById("tooltipTitle").innerHTML = `Wild Areas`
-        if (ttdata === `Wild Areas`) document.getElementById("tooltipBottom").innerHTML = `All Pokemon in Wild Areas might be caught by defeating them. Wild Areas rotate every day, so be sure to check out what can be caught today!`
+        if (ttdata === `Wild Areas`) document.getElementById("tooltipTitle").innerHTML = t("help.wild.title")
+        if (ttdata === `Wild Areas`) document.getElementById("tooltipBottom").innerHTML = t("help.wild.body")
 
-        if (ttdata === `Dungeons`) document.getElementById("tooltipTitle").innerHTML = `Dungeons`
-        if (ttdata === `Dungeons`) document.getElementById("tooltipBottom").innerHTML = `Pokemon in Dungeons can't be caught, but they can drop useful items and EXP. Dungeons rotate every day aswell`
+        if (ttdata === `Dungeons`) document.getElementById("tooltipTitle").innerHTML = t("help.dungeons.title")
+        if (ttdata === `Dungeons`) document.getElementById("tooltipBottom").innerHTML = t("help.dungeons.body")
 
-        if (ttdata === `Training`) document.getElementById("tooltipTitle").innerHTML = `Training`
-        if (ttdata === `Training`) document.getElementById("tooltipBottom").innerHTML = `Challenge your Pokemon against waves of foes in order to get stronger. You will naturally have typing advantage against Pokemon fought against, and their level will scale to yours. Type Immunities inside training will be instead converted to resistances.<br><br>Failing a training will result in no gains`
+        if (ttdata === `Training`) document.getElementById("tooltipTitle").innerHTML = t("help.training.title")
+        if (ttdata === `Training`) document.getElementById("tooltipBottom").innerHTML = t("help.training.body")
 
-        if (ttdata === `Events`) document.getElementById("tooltipTitle").innerHTML = `Events`
-        if (ttdata === `Events`) document.getElementById("tooltipBottom").innerHTML = `Events might house both items and Pokemon to get. Events marked with a skull signify powerful foes that usually require an item to catch (The item wont be consumed if failed to defeat) that can be acquired in the collection events. All Events rotate every three days.`
+        if (ttdata === `Events`) document.getElementById("tooltipTitle").innerHTML = t("help.events.title")
+        if (ttdata === `Events`) document.getElementById("tooltipBottom").innerHTML = t("help.events.body")
 
-        if (ttdata === `Genetics`) document.getElementById("tooltipTitle").innerHTML = `Genetics`
-        if (ttdata === `Genetics`) document.getElementById("tooltipBottom").innerHTML = `With genetics, you can modify the parameters of a level 100 Pokemon (the host) and influence them based on another Pokemon (the sample)<br><br>Doing so, the level of the host will reset back to 1 while keeping all 4 of its currently selected moves, and a chance to increase its IV's<br><br>Genetics can also be influenced by using genetic-aiding items, which you can use at the end of the operation<br><br>You can find more information about the specifics of genetics in the guide section`
+        if (ttdata === `Genetics`) document.getElementById("tooltipTitle").innerHTML = t("help.genetics.title")
+        if (ttdata === `Genetics`) document.getElementById("tooltipBottom").innerHTML = t("help.genetics.body")
 
-        if (ttdata === `Pokerus`) document.getElementById("tooltipTitle").innerHTML = `Pokerus`
-        if (ttdata === `Pokerus`) document.getElementById("tooltipBottom").innerHTML = `Every 12 hours, some of your Pokemon will contract Pokerus. This virus is entirely beneficial, and will add one level of compatibility to the Pokemon in genetics when used as a host`
+        if (ttdata === `Pokerus`) document.getElementById("tooltipTitle").innerHTML = t("help.pokerus.title")
+        if (ttdata === `Pokerus`) document.getElementById("tooltipBottom").innerHTML = t("help.pokerus.body")
 
         if (ttdata === `settingsNewPkmn`) document.getElementById("tooltipTitle").innerHTML = `Setting`
         if (ttdata === `settingsNewPkmn`) document.getElementById("tooltipBottom").innerHTML = `Automatically hides got Pokemon that are not new after a battle. Excluded from this setting are: New Pokemon, Iv's Ups and Shiny Pokemon`

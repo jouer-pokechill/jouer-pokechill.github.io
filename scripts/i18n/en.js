@@ -15,6 +15,7 @@ window.i18nData.en = {
     "menu.genetics": "Genetics",
     "menu.mysteryGift": "Mystery Gift",
     "menu.exportReward": "Export Reward",
+    "menu.wonder": "Wonder Trade",
     "menu.dictionary": "Dictionary",
     "menu.guide": "Guide",
     "menu.settings": "Settings",

@@ -15,6 +15,7 @@ window.i18nData.fr = {
     "menu.genetics": "Génétique",
     "menu.mysteryGift": "Cadeau Mystère",
     "menu.exportReward": "Récompense d’export",
+    "menu.wonder": "Échange Miracle",
     "menu.dictionary": "Dictionnaire",
     "menu.guide": "Guide",
     "menu.settings": "Paramètres",

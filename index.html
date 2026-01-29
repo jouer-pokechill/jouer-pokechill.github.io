@@ -838,6 +838,20 @@
 
 
 
+        <div id="wonder-menu">
+
+
+            <div class="wonder-content">
+                <img id="wonder-ball" src="img/items/beastball.png">
+                <img id="wonder-pkmn" class="sprite-trim" src="img/pkmn/sprite/dialga.png">
+                <img src="img/resources/pkmn-shadow.png" style="opacity: 0.5; margin-bottom:7rem; margin-top: -5rem;">
+                <div id="wonder-text" onclick="document.getElementById('wonder-menu').style.display = 'none'">Thanks for the Dialga!</div>
+            </div>
+
+
+        </div>
+
+
 
 
 
@@ -1293,6 +1307,15 @@
             <span data-i18n="menu.training">Training</span>
         </div>
 
+        <!--
+
+        <div class="menu-item" id="menu-item-custom-challenges" onClick="switchMenu('custom-challenges')">
+            <img src="img/items/endorsement.png">
+            <span>Challenges</span>
+        </div>
+
+        -->
+
         <div class="menu-item" id="menu-item-genetics" onClick="switchMenu('genetics')">
             <img src="img/items/dnaSplicer.png">
             <span data-i18n="menu.genetics">Genetics</span>
@@ -1308,6 +1331,11 @@
         <div class="menu-item" id="menu-export-reward" onClick="claimExportReward()">
             <img src="img/items/parcel.png">
             <span data-i18n="menu.exportReward">Export Reward</span>
+        </div>
+
+        <div class="menu-item" id="menu-wonder-trade" onClick="claimWonderTrade()">
+            <img src="img/items/beastball.png">
+            <span data-i18n="menu.wonder">Wonder Trade</span>
         </div>
 
         <div class="menu-item" id="menu-item-dictionary" onClick="switchMenu('dictionary')">

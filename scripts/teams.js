@@ -501,7 +501,14 @@ function switchMember(member){
     }
 
 
+
+
+
+
     if (pkmn[ team[member].pkmn.id ].playerHp <= 0) return;
+
+
+
 
 
 
@@ -512,7 +519,6 @@ function switchMember(member){
     lastCrossStab = undefined
     barProgressPlayer = 0
     if (barPlayer) barPlayer.style.width = 0
-    exploreCombatPlayerTurn = 1
     exploreActiveMember = member
 
 
@@ -561,6 +567,12 @@ function setPkmnTeam(){
         
 
         switchMember(i)
+
+            if (saved.currentArea == areas.frontierBattleFactory.id) {
+            fatigueDamage = pkmn[ team[exploreActiveMember].pkmn.id ].playerHpMax/15
+            pkmn[ team[exploreActiveMember].pkmn.id ].playerHp -= fatigueDamage
+            updateTeamPkmn()
+            }
         
         
         
